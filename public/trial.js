@@ -11,7 +11,7 @@ const calibrationOutput = document.getElementById("demo");
 const url = "http://localhost:3000/save/";
 
 let startTime, stopTime;
-let calibrationValue = 1;
+let calibrationValue = 0;
 let participationId = 0;
 let participation_id_matrix = 0;
 let shuffledConditionMatrix = [];
