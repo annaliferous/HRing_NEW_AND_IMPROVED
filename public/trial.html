@@ -64,7 +64,11 @@
             <p>Please select a fitting canvas</p>
           </div>
           <div class="grid-container">
-            <div id="rise" class="canvas-container">
+            <div
+              id="rise"
+              class="canvas-container"
+              onclick="buttonFunctions('rise')"
+            >
               <canvas
                 class="canvas"
                 id="riseCanvas"
@@ -79,7 +83,11 @@
                 Select
               </button>
             </div>
-            <div id="fall" class="canvas-container">
+            <div
+              id="fall"
+              class="canvas-container"
+              onclick="buttonFunctions('fall')"
+            >
               <canvas
                 class="canvas"
                 id="fallCanvas"
@@ -94,7 +102,11 @@
                 Select
               </button>
             </div>
-            <div id="olymp" class="canvas-container">
+            <div
+              id="olymp"
+              class="canvas-container"
+              onclick="buttonFunctions('olymp')"
+            >
               <canvas
                 class="canvas"
                 id="olympCanvas"
@@ -109,7 +121,11 @@
                 Select
               </button>
             </div>
-            <div id="tartarus" class="canvas-container">
+            <div
+              id="tartarus"
+              class="canvas-container"
+              onclick="buttonFunctions('tartarus')"
+            >
               <canvas
                 class="canvas"
                 id="tartarusCanvas"
@@ -128,8 +144,8 @@
         </div>
       </div>
 
-      <!-- Intensity Section -->
-      <div class="container" id="intensity_container">
+      <!-- Pleasent Section -->
+      <div class="container" id="pleasant_container">
         <div class="outline">
           <div class="headline">
             <p>Experiencing the haptic sensations was pleasant to me.</p>
@@ -141,25 +157,23 @@
               max="100"
               value="50"
               class="slider"
-              id="intensity_slider"
+              id="pleasant_slider"
             />
             <div class="slider-labels">
               <span>Strongly Disagree</span>
               <span>Strongly Agree</span>
             </div>
           </div>
-          <button class="button" id="intensity_send">Enter</button>
-          <button class="button" id="intensity_return">Go Back</button>
+          <button class="button" id="pleasant_send">Enter</button>
+          <button class="button" id="pleasant_return">Go Back</button>
         </div>
       </div>
 
-      <!-- Height Section -->
-      <div class="container" id="height_container">
+      <!-- Focus Section -->
+      <div class="container" id="focus_container">
         <div class="outline">
           <div class="headline">
-            <p>
-              The haptic sensations resembled those I experience in real life.
-            </p>
+            <p>The haptic interactions made me more focused.</p>
           </div>
           <div class="slidecontainer">
             <input
@@ -168,18 +182,45 @@
               max="100"
               value="50"
               class="slider"
-              id="height_slider"
+              id="focus_slider"
             />
             <div class="slider-labels">
               <span>Strongly Disagree</span>
               <span>Strongly Agree</span>
             </div>
           </div>
-          <button class="button" id="height_send">Enter</button>
-          <button class="button" id="height_return">Go Back</button>
+          <button class="button" id="focus_send">Enter</button>
+          <button class="button" id="focus_return">Go Back</button>
         </div>
       </div>
     </section>
+
+    <!-- Realism Section -->
+    <div class="container" id="realism_container">
+      <div class="outline">
+        <div class="headline">
+          <p>
+            The haptic sensations resembled those I experience in real life.
+          </p>
+        </div>
+        <div class="slidecontainer">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="50"
+            class="slider"
+            id="realism_slider"
+          />
+          <div class="slider-labels">
+            <span>Strongly Disagree</span>
+            <span>Strongly Agree</span>
+          </div>
+        </div>
+        <button class="button" id="realism_send">Enter</button>
+        <button class="button" id="realism_return">Go Back</button>
+      </div>
+    </div>
 
     <script src="trial.js"></script>
   </body>

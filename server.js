@@ -94,8 +94,9 @@ function createEmptySession() {
     stopTime: null,
     array: null,
     canvas: null,
-    intensity: null,
-    height: null,
+    pleasant: null,
+    focus: null,
+    realism: null,
   };
 }
 
@@ -107,8 +108,9 @@ function safeSession() {
       currentSession.stopTime,
       currentSession.array,
       currentSession.canvas,
-      currentSession.intensity,
-      currentSession.height,
+      currentSession.pleasant,
+      currentSession.focus,
+      currentSession.realism,
     ];
     allSessions.push(sessionArray);
     console.log(`Session saved:`, sessionArray);
@@ -194,15 +196,20 @@ server.get("/save/canvas/:selectedCanvas", (req, res) => {
   console.log(req.params.selectedCanvas);
   currentSession.canvas = req.params.selectedCanvas;
 });
-server.get("/save/intensity/:intensity", (req, res) => {
-  res.send("Intensity was send!");
-  currentSession.intensity = req.params.intensity;
-  console.log(req.params.intensity);
+server.get("/save/intensity/:pleasant", (req, res) => {
+  res.send("Pleasant was send!");
+  currentSession.pleasant = req.params.pleasant;
+  console.log(req.params.pleasant);
 });
-server.get("/save/height/:height", (req, res) => {
-  res.send("Height was send!");
-  currentSession.height = req.params.height;
-  console.log(req.params.height);
+server.get("/save/height/:focus", (req, res) => {
+  res.send("Focus was send!");
+  currentSession.focus = req.params.focus;
+  console.log(req.params.focus);
+});
+server.get("/save/height/:realism", (req, res) => {
+  res.send("Realism was send!");
+  currentSession.realism = req.params.realism;
+  console.log(req.params.realism);
 });
 server.get("/save/session", (req, res) => {
   safeSession();

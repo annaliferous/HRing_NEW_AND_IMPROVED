@@ -72,16 +72,8 @@ document.getElementById("calibration_send").addEventListener("click", () => {
   calibrationValue = parseInt(calibrationSlider.value);
   participationId = parseInt(participationIdInput.value);
 
-  // Setup condition matrix for this participant
   setupConditionMatrix(participationId);
-  // Send calibrationValue + participantId
-  /* fetch(url + "participationId/" + participation_id);
-  fetch(url + "calibrationValue/" + calibrationValue);
 
-  choosePath();
-
-  calibrationSection.style.display = "none";
-  screenSection.style.display = "block"; */
   fetchData(url + "participationId/" + participationId)
     .then(() => fetchData(url + "calibrationValue/" + calibrationValue))
     .then(() => choosePath())
@@ -119,8 +111,9 @@ screenSlider.addEventListener("mouseup", () => {
 
       setTimeout(() => {
         screenSlider.value = 0;
-        intensity_slider.value = 0;
-        height_slider.value = 0;
+        pleasant_slider.value = 50;
+        focus_slider.value = 50;
+        realism_slider.value = 50;
         screenSection.style.display = "none";
         questionnaireSection.style.display = "block";
       }, 100);
@@ -163,22 +156,22 @@ function shuffleArray(array, seed) {
   return arr;
 }
 const conditionMatrix = [
-  [0, "up", 25, 100],
-  [1, "up", 50, 100],
-  [2, "up", 75, 100],
-  [3, "up", 100, 100],
-  [4, "down", 25, 100],
-  [5, "down", 50, 100],
-  [6, "down", 75, 100],
-  [7, "down", 100, 100],
-  [8, "olymp", 25, 100],
-  [9, "olymp", 50, 100],
-  [10, "olymp", 75, 100],
-  [11, "olymp", 100, 100],
-  [12, "tartarus", 25, 100],
-  [13, "tartarus", 50, 100],
-  [14, "tartarus", 75, 100],
-  [15, "tartarus", 100, 100],
+  [0, "up", 0, 100],
+  [1, "up", 25, 100],
+  [2, "up", 50, 100],
+  [3, "up", 75, 100],
+  [4, "down", 0, 100],
+  [5, "down", 25, 100],
+  [6, "down", 50, 100],
+  [7, "down", 75, 100],
+  [8, "olymp", 0, 100],
+  [9, "olymp", 25, 100],
+  [10, "olymp", 50, 100],
+  [11, "olymp", 75, 100],
+  [12, "tartarus", 0, 100],
+  [13, "tartarus", 25, 100],
+  [14, "tartarus", 50, 100],
+  [15, "tartarus", 75, 100],
 ];
 
 function setupConditionMatrix(participantId) {
@@ -211,21 +204,6 @@ function nextMode() {
     screenSection.style.display = "none";
     questionnaireSection.style.display = "none";
   }
-  /*  currentModeIndex++;
-  //Der Index wird zu früh erhöht!!!!!!!!
-  // Fix!!!!!!!
-  arrayLoop = 4;
-  if (currentModeIndex >= shuffledConditionMatrix.length) {
-    if (arrayLoop > 0) {
-      currentModeIndex = 0;
-      /* choosePath(); */
-  /*
-    }
-    alert("Thank you for your participations!.");
-    console.log("Script stopped after 64 runs.");
-    return;
-  } */
-  /* choosePath(); */
 }
 
 // ===== CALCULATION =====
@@ -372,44 +350,57 @@ const canvas_section_container = document.getElementById(
   "canvas_section_container"
 );
 
-const intensity_send = document.getElementById("intensity_send");
-const intensity_return = document.getElementById("intensity_return");
+const pleasent_send = document.getElementById("pleasent_send");
+const pleasant_return = document.getElementById("pleasant_return");
+const pleasant_container = document.getElementById("pleasant_container");
 
-const height_send = document.getElementById("height_send");
-const height_return = document.getElementById("height_return");
+const focus_send = document.getElementById("focus_send");
+const focus_return = document.getElementById("focus_return");
+const focus_container = document.getElementById("focus_container");
 
-const intensity_container = document.getElementById("intensity_container");
-const height_container = document.getElementById("height_container");
+const realism_send = document.getElementById("realism_send");
+const realism_return = document.getElementById("realism_return");
+const realism_container = document.getElementById("realism_container");
 
 function buttonFunctions(canvas) {
-  intensity_container.scrollIntoView({ behavior: "smooth" });
+  pleasant_container.scrollIntoView({ behavior: "smooth" });
   selectedCanvas = canvas;
   console.log(selectedCanvas);
 }
 
-intensity_send.addEventListener("click", () => {
-  height_container.scrollIntoView({ behavior: "smooth" });
+pleasent_send.addEventListener("click", () => {
+  focus_container.scrollIntoView({ behavior: "smooth" });
 });
-intensity_return.addEventListener("click", () => {
+pleasant_return.addEventListener("click", () => {
   canvas_section_container.scrollIntoView({ behavior: "smooth" });
 });
 
-height_return.addEventListener("click", () => {
-  intensity_container.scrollIntoView({ behavior: "smooth" });
+focus_send.addEventListener("click", () => {
+  realism_container.scrollIntoView({ behavior: "smooth" });
+});
+focus_return.addEventListener("click", () => {
+  pleasant_container.scrollIntoView({ behavior: "smooth" });
+});
+
+realism_return.addEventListener("click", () => {
+  focus_container.scrollIntoView({ behavior: "smooth" });
 });
 
 //Send [canvas, intensity, height]
-const intensity_slider = document.getElementById("intensity_slider");
-const height_slider = document.getElementById("height_slider");
+const pleasant_slider = document.getElementById("pleasant_slider");
+const focus_slider = document.getElementById("focus_slider");
+const realism_slider = document.getElementById("realism_slider");
 
-height_send.addEventListener("click", () => {
-  let intensity = intensity_slider.value;
-  let height = height_slider.value;
+realism_send.addEventListener("click", () => {
+  let pleasant = pleasant_slider.value;
+  let focus = focus_slider.value;
+  let realism = realism_slider.value;
 
   // Send questionnaire data to backend
   fetchData(url + "canvas/" + selectedCanvas)
-    .then(() => fetchData(url + "intensity/" + intensity))
-    .then(() => fetchData(url + "height/" + height))
+    .then(() => fetchData(url + "pleasant/" + pleasant))
+    .then(() => fetchData(url + "focus/" + focus))
+    .then(() => fetchData(url + "realism/" + realism))
     .then(() => fetchData(url + "session"))
     .then(() => {
       nextMode();
