@@ -22,26 +22,26 @@ if (!fs.existsSync(dataDir)) {
 let port;
 let parser;
 
+//autoconnect to correct port, not hardcoded anymore
 async function initializeSerial() {
   try {
     const ports = await SerialPort.list();
 
-    // Log all ports once for debugging
-    console.log("Available ports:", ports);
+    // Log all ports
+    /* console.log("Available ports:", ports); */
 
-    const picoPortInfo = ports.find(
+    const picoPort = ports.find(
       (p) => p.vendorId === "2e8a" // Raspberry Pi Pico vendor ID
-      // optionally also check productId
     );
 
-    if (!picoPortInfo) {
+    if (!picoPort) {
       console.error("❌ Pico not found");
       return;
     }
 
     port = new SerialPort({
       /* path: "/dev/ttyACM0", */
-      path: picoPortInfo.path,
+      path: picoPort.path,
       baudRate: 9600,
       /* autoOpen: false, */
     });
@@ -49,24 +49,17 @@ async function initializeSerial() {
     // Parser for received data
     parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
-    //Open Port
-    port.open((err) => {
-      if (err) {
-        console.error("Failed to open serial port:", err);
-        port = null;
-      } else {
-        console.log("✅ Serial port opened successfully");
-        resetMotors();
+    port.on("open", () => {
+      console.log(`Connected to Pico on ${picoPort.path}`);
+      resetMotors();
+    });
 
-        // Listener for data from Pico
-        parser.on("data", (data) => {
-          console.log(`Received from Pico: ${data}`);
-        });
-      }
+    parser.on("data", (data) => {
+      console.log(`Received from Pico: ${data}`);
     });
 
     port.on("error", (err) => {
-      console.error("Serial port error:", err);
+      console.error("Serial error:", err.message);
     });
   } catch (err) {
     console.error("Failed to initialize serial port:", err);

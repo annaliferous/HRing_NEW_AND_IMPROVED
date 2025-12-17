@@ -1,14 +1,14 @@
 {
-    "name": "basic-socket",
-    "version": "0.0.1",
-    "description": "Communication between HTML/JavaScript and Arduino",
-    "dependencies": {
-        "convert-array-to-csv": "^2.0.0",
-        "csv": "^6.3.5",
-        "express": "^5.1.0",
-        "rand-seed": "^3.0.0",
-        "serialport": "^13.0.0",
-        "socket.io": "^4.6.1",
-        "ws": "^8.18.0"
-    }
+  "name": "basic-socket",
+  "version": "0.0.1",
+  "description": "Communication between HTML/JavaScript and Arduino",
+  "dependencies": {
+    "convert-array-to-csv": "^2.0.0",
+    "csv": "^6.3.5",
+    "express": "^5.2.1",
+    "rand-seed": "^3.0.0",
+    "serialport": "^13.0.0",
+    "socket.io": "^4.6.1",
+    "ws": "^8.18.0"
+  }
 }
