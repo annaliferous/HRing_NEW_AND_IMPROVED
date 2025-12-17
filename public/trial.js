@@ -350,7 +350,7 @@ const canvas_section_container = document.getElementById(
   "canvas_section_container"
 );
 
-const pleasent_send = document.getElementById("pleasent_send");
+const pleasant_send = document.getElementById("pleasent_send");
 const pleasant_return = document.getElementById("pleasant_return");
 const pleasant_container = document.getElementById("pleasant_container");
 
@@ -368,7 +368,7 @@ function buttonFunctions(canvas) {
   console.log(selectedCanvas);
 }
 
-pleasent_send.addEventListener("click", () => {
+pleasant_send.addEventListener("click", () => {
   focus_container.scrollIntoView({ behavior: "smooth" });
 });
 pleasant_return.addEventListener("click", () => {
