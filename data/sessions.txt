@@ -1,4 +1,6 @@
-Participation ID: N/A
-Calibration Value: N/A
+Participation ID: 999
+Calibration Value: 8
 
 Sessions:
+Session 1: ["tartarus","1765989334888","1765989335384","14,tartarus,50,100","tartarus","33","60","28"]
+Session 2: ["tartarus","1765989347028","1765989348640","13,tartarus,25,100","tartarus","50","50","50"]

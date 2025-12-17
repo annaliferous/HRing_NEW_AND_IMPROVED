@@ -8,6 +8,10 @@ const screenSlider = document.getElementById("screen_slider");
 const participationIdInput = document.getElementById("participation_id");
 const calibrationOutput = document.getElementById("demo");
 
+const pleasant_slider = document.getElementById("pleasant_slider");
+const focus_slider = document.getElementById("focus_slider");
+const realism_slider = document.getElementById("realism_slider");
+
 const url = "http://localhost:3000/save/";
 
 let startTime, stopTime;
@@ -385,11 +389,6 @@ focus_return.addEventListener("click", () => {
 realism_return.addEventListener("click", () => {
   focus_container.scrollIntoView({ behavior: "smooth" });
 });
-
-//Send [canvas, intensity, height]
-const pleasant_slider = document.getElementById("pleasant_slider");
-const focus_slider = document.getElementById("focus_slider");
-const realism_slider = document.getElementById("realism_slider");
 
 realism_send.addEventListener("click", () => {
   let pleasant = pleasant_slider.value;

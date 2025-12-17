@@ -159,34 +159,28 @@ server.get("/save/calibrationMain/:currentCalVal", (req, res) => {
 
 server.get("/save/participationId/:id", (req, res) => {
   res.send("ParticipationId was send!");
-  console.log(req.params.id);
   participationId = req.params.id;
 });
 
 server.get("/save/calibrationValue/:calVal", (req, res) => {
   res.send("calibrationValue was send!");
-  console.log(req.params.calVal);
   calibrationValue = req.params.calVal;
 });
 server.get("/save/index/:index", (req, res) => {
   res.send("index was send!");
-  console.log(req.params.index);
   currentSession.index = req.params.index;
 });
 
 server.get("/save/startTime/:start", (req, res) => {
   res.send("startTime was send!");
-  console.log(req.params.start);
   currentSession.startTime = req.params.start;
 });
 server.get("/save/stopTime/:stop", (req, res) => {
   res.send("stopTime was send!");
-  console.log(req.params.stop);
   currentSession.stopTime = req.params.stop;
 });
 server.get("/save/array/:array", (req, res) => {
   res.send("ConditionArray was send!");
-  console.log(req.params.array);
   currentSession.array = req.params.array;
 });
 server.get("/save/mode/:mode", (req, res) => {
@@ -199,23 +193,19 @@ server.get("/save/mode/:mode", (req, res) => {
 });
 server.get("/save/canvas/:selectedCanvas", (req, res) => {
   res.send("selectedCanvas was send!");
-  console.log(req.params.selectedCanvas);
   currentSession.canvas = req.params.selectedCanvas;
 });
-server.get("/save/intensity/:pleasant", (req, res) => {
+server.get("/save/pleasant/:pleasant", (req, res) => {
   res.send("Pleasant was send!");
   currentSession.pleasant = req.params.pleasant;
-  console.log(req.params.pleasant);
 });
-server.get("/save/height/:focus", (req, res) => {
+server.get("/save/focus/:focus", (req, res) => {
   res.send("Focus was send!");
   currentSession.focus = req.params.focus;
-  console.log(req.params.focus);
 });
-server.get("/save/height/:realism", (req, res) => {
+server.get("/save/realism/:realism", (req, res) => {
   res.send("Realism was send!");
   currentSession.realism = req.params.realism;
-  console.log(req.params.realism);
 });
 server.get("/save/session", (req, res) => {
   safeSession();
