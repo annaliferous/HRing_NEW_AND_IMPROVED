@@ -1,215 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="trial.css" />
-    <title>HRing Trial Run</title>
-  </head>
 
-  <body>
-    <!-- Calibration Screen -->
-    <section id="calibration" class="calibration">
-      <div class="container">
-        <div class="outline">
-          <label for="participation_id">Participation ID:</label>
-          <input type="text" id="participation_id" maxlength="4" size="4" />
-          <br /><br />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="trial.css" />
+  <title>HRing Trial Run</title>
+</head>
 
-          <div class="headline">
-            <p>Please click "Send" when you start to feel any pressure</p>
+<body>
+  <!-- Calibration Screen -->
+  <section id="calibration" class="calibration">
+    <div class="container">
+      <div class="outline">
+        <label for="participation_id">Participation ID:</label>
+        <input type="text" id="participation_id" maxlength="4" size="4" />
+        <br /><br />
+
+        <div class="headline">
+          <p>Please click "Send" when you start to feel any pressure</p>
+        </div>
+
+        <div class="slidecontainer">
+          <input type="range" min="0" max="100" value="0" class="slider" id="calibration_slider" />
+          <p>Value: <span id="demo">0</span></p>
+          <button class="button" id="calibration_send">Send</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--Slider Task Screen-->
+  <section id="screen" class="screen" style="display: none">
+    <div class="container">
+      <div class="outline">
+        <div class="headline">
+          <p>Please move the circle to the end point</p>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="0" max="100" value="0" class="slider" id="screen_slider" />
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="questionnaire" class="questionnaire" style="display: none">
+    <!-- Canvas Section -->
+    <div class="container" id="canvas_section_container">
+      <div class="outline">
+        <div class="headline">
+          <p>Please select a fitting canvas</p>
+        </div>
+        <div class="grid-container">
+          <div id="rise" class="canvas-container" onclick="buttonFunctions('rise')">
+            <canvas class="canvas" id="riseCanvas" width="200" height="200"></canvas>
+            Select
+            </button>
           </div>
-
-          <div class="slidecontainer">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="0"
-              class="slider"
-              id="calibration_slider"
-            />
-            <p>Value: <span id="demo">0</span></p>
-            <button class="button" id="calibration_send">Send</button>
+          <div id="fall" class="canvas-container" onclick="buttonFunctions('fall')">
+            <canvas class="canvas" id="fallCanvas" width="200" height="200"></canvas>
+            Select
+            </button>
+          </div>
+          <div id="olymp" class="canvas-container" onclick="buttonFunctions('olymp')">
+            <canvas class="canvas" id="olympCanvas" width="200" height="200"></canvas>
+            Select
+            </button>
+          </div>
+          <div id="tartarus" class="canvas-container" onclick="buttonFunctions('tartarus')">
+            <canvas class="canvas" id="tartarusCanvas" width="200" height="200"></canvas>
+            Select
+            </button>
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!--Slider Task Screen-->
-    <section id="screen" class="screen" style="display: none">
-      <div class="container">
-        <div class="outline">
-          <div class="headline">
-            <p>Please move the circle to the end point</p>
+    <!-- Pleasent Section -->
+    <div class="container" id="pleasant_container">
+      <div class="outline">
+        <div class="headline">
+          <p>Experiencing the haptic sensations was pleasant to me.</p>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="0" max="100" value="50" class="slider" id="pleasant_slider" />
+          <div class="slider-labels">
+            <span>Strongly Disagree</span>
+            <span>Strongly Agree</span>
           </div>
           <div class="slidecontainer">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="0"
-              class="slider"
-              id="screen_slider"
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="questionnaire" class="questionnaire" style="display: none">
-      <!-- Canvas Section -->
-      <div class="container" id="canvas_section_container">
-        <div class="outline">
-          <div class="headline">
-            <p>Please select a fitting canvas</p>
-          </div>
-          <div class="grid-container">
-            <div
-              id="rise"
-              class="canvas-container"
-              onclick="buttonFunctions('rise')"
-            >
-              <canvas
-                class="canvas"
-                id="riseCanvas"
-                width="200"
-                height="200"
-              ></canvas>
-              <button
-                class="button"
-                id="rise_button"
-                onclick="buttonFunctions('rise')"
-              >
-                Select
-              </button>
-            </div>
-            <div
-              id="fall"
-              class="canvas-container"
-              onclick="buttonFunctions('fall')"
-            >
-              <canvas
-                class="canvas"
-                id="fallCanvas"
-                width="200"
-                height="200"
-              ></canvas>
-              <button
-                class="button"
-                id="fall_button"
-                onclick="buttonFunctions('fall')"
-              >
-                Select
-              </button>
-            </div>
-            <div
-              id="olymp"
-              class="canvas-container"
-              onclick="buttonFunctions('olymp')"
-            >
-              <canvas
-                class="canvas"
-                id="olympCanvas"
-                width="200"
-                height="200"
-              ></canvas>
-              <button
-                class="button"
-                id="olymp_button"
-                onclick="buttonFunctions('olymp')"
-              >
-                Select
-              </button>
-            </div>
-            <div
-              id="tartarus"
-              class="canvas-container"
-              onclick="buttonFunctions('tartarus')"
-            >
-              <canvas
-                class="canvas"
-                id="tartarusCanvas"
-                width="200"
-                height="200"
-              ></canvas>
-              <button
-                class="button"
-                id="tartarus"
-                onclick="buttonFunctions('tartarus')"
-              >
-                Select
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pleasent Section -->
-      <div class="container" id="pleasant_container">
-        <div class="outline">
-          <div class="headline">
-            <p>Experiencing the haptic sensations was pleasant to me.</p>
-          </div>
-          <div class="slidecontainer">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="50"
-              class="slider"
-              id="pleasant_slider"
-            />
-            <div class="slider-labels">
-              <span>Strongly Disagree</span>
-              <span>Strongly Agree</span>
-            </div>
-          </div>
-          <button class="button" id="pleasant_send">Enter</button>
-          <button class="button" id="pleasant_return">Go Back</button>
-        </div>
-      </div>
-
-      <!-- Focus Section -->
-      <div class="container" id="focus_container">
-        <div class="outline">
-          <div class="headline">
-            <p>The haptic interactions made me more focused.</p>
-          </div>
-          <div class="slidecontainer">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="50"
-              class="slider"
-              id="focus_slider"
-            />
-            <div class="slider-labels">
-              <span>Strongly Disagree</span>
-              <span>Strongly Agree</span>
-            </div>
-          </div>
-          <button class="button" id="focus_send">Enter</button>
-          <button class="button" id="focus_return">Go Back</button>
-        </div>
-      </div>
-      <!-- Realism Section -->
-      <div class="container" id="realism_container">
-        <div class="outline">
-          <div class="headline">
-            <p>
-              The haptic sensations resembled those I experience in real life.
-            </p>
-          </div>
-          <div class="slidecontainer">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="50"
-              class="slider"
-              id="realism_slider"
-            />
+            <input type="range" min="0" max="100" value="50" class="slider" id="realism_slider" />
             <div class="slider-labels">
               <span>Strongly Disagree</span>
               <span>Strongly Agree</span>
@@ -219,8 +98,48 @@
           <button class="button" id="realism_return">Go Back</button>
         </div>
       </div>
-    </section>
+  </section>
 
-    <script src="trial.js"></script>
-  </body>
+  <!-- Focus Section -->
+  <div class="container" id="focus_container">
+    <div class="outline">
+      <div class="headline">
+        <p>The haptic interactions made me more focused.</p>
+      </div>
+      <div class="slidecontainer">
+        <input type="range" min="0" max="100" value="50" class="slider" id="focus_slider" />
+        <div class="slider-labels">
+          <span>Strongly Disagree</span>
+          <span>Strongly Agree</span>
+        </div>
+      </div>
+      <button class="button" id="focus_send">Enter</button>
+      <button class="button" id="focus_return">Go Back</button>
+    </div>
+  </div>
+  </section>
+
+  <!-- Realism Section -->
+  <div class="container" id="realism_container">
+    <div class="outline">
+      <div class="headline">
+        <p>
+          The haptic sensations resembled those I experience in real life.
+        </p>
+      </div>
+      <div class="slidecontainer">
+        <input type="range" min="0" max="100" value="50" class="slider" id="realism_slider" />
+        <div class="slider-labels">
+          <span>Strongly Disagree</span>
+          <span>Strongly Agree</span>
+        </div>
+      </div>
+      <button class="button" id="realism_send">Enter</button>
+      <button class="button" id="realism_return">Go Back</button>
+    </div>
+  </div>
+
+  <script src="trial.js"></script>
+</body>
+
 </html>

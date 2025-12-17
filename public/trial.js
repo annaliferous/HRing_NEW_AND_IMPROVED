@@ -350,7 +350,7 @@ const canvas_section_container = document.getElementById(
   "canvas_section_container"
 );
 
-const pleasant_send = document.getElementById("pleasent_send");
+const pleasant_send = document.getElementById("pleasant_send");
 const pleasant_return = document.getElementById("pleasant_return");
 const pleasant_container = document.getElementById("pleasant_container");
 
