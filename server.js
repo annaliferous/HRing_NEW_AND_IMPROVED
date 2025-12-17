@@ -22,15 +22,28 @@ if (!fs.existsSync(dataDir)) {
 let port;
 let parser;
 
-function initializeSerial() {
+async function initializeSerial() {
   try {
-    //Connection with Pico with Serial
-    const { SerialPort } = require("serialport");
+    const ports = await SerialPort.list();
+
+    // Log all ports once for debugging
+    console.log("Available ports:", ports);
+
+    const picoPortInfo = ports.find(
+      (p) => p.vendorId === "2e8a" // Raspberry Pi Pico vendor ID
+      // optionally also check productId
+    );
+
+    if (!picoPortInfo) {
+      console.error("❌ Pico not found");
+      return;
+    }
 
     port = new SerialPort({
-      path: "/dev/ttyACM0",
+      /* path: "/dev/ttyACM0", */
+      path: picoPortInfo.path,
       baudRate: 9600,
-      autoOpen: false,
+      /* autoOpen: false, */
     });
 
     // Parser for received data
