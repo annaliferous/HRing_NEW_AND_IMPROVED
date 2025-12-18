@@ -27,3 +27,10 @@ npm start
 ## Contributers
 
 ## Licenses
+
+## Still to fix
+- save after every mode
+- cable-less connection (maybe Hotspot -> connection still good?)
+- different curves: slider for choosing (new branch)
+- value change BEFORE touching slider
+- a sliderless version (new branch)
