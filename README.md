@@ -34,3 +34,4 @@ npm start
 - different curves: slider for choosing (new branch)
 - value change BEFORE touching slider
 - a sliderless version (new branch)
+- connection to tablet????????
