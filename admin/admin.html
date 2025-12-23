@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="admin.css" />
+    <link
+      href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/98.css" />
+    <title>HRing Trial Run</title>
+  </head>
+
+  <body>
+    <!-- Editing Study -->
+    <section style="display: none">
+      <div class="dropdown">
+        <button onclick="myFunction()" class="dropbtn">
+          Choose your editing method
+        </button>
+      </div>
+
+      <div id="table"></div>
+      <button id="load-data" class="load-data">Load Data</button>
+      <button id="shuffle-data" class="shuffle-data">Shuffle Data</button>
+    </section>
+
+    <!-- During Study -->
+    <!-- Calibration Section-->
+    <section style="display: none">
+      <div class="window">
+        <div class="title-bar">
+          <div class="title-bar-text">Calibration</div>
+          <div class="title-bar-controls">
+            <button aria-label="Minimize"></button>
+            <button aria-label="Maximize"></button>
+            <button aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="window-body">
+          <div id="hourglass"></div>
+          <p>Please wait until the participant finished the calibration</p>
+        </div>
+      </div>
+    </section>
+    <!-- Study Slider Section-->
+    <section>
+      <div class="field-row">
+        <label for="text1">Participation ID: </label>
+        <div class="field-border-disabled" style="padding: 5px">`$value`</div>
+        <label for="text2">Calibration Value: </label>
+        <div class="field-border-disabled" style="padding: 5px">`$value`</div>
+      </div>
+      <div class="field-row">
+        <label for="text3">Current Data: </label>
+        <div class="field-border-disabled" style="padding: 5px">`$value`</div>
+      </div>
+
+      <div class="field-row" style="width: 800px">
+        <input id="range23" type="range" min="0" max="100" value="0" />
+      </div>
+    </section>
+    <!-- Questionnaire Section-->
+
+    <script src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
