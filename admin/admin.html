@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="admin.css" />
+
     <link
       href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css"
       rel="stylesheet"
@@ -13,21 +13,35 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
     <link rel="stylesheet" href="https://unpkg.com/98.css" />
+    <link rel="stylesheet" href="admin.css" />
     <title>HRing Trial Run</title>
   </head>
 
   <body>
     <!-- Editing Study -->
-    <section style="display: none">
-      <div class="dropdown">
-        <button onclick="myFunction()" class="dropbtn">
-          Choose your editing method
-        </button>
-      </div>
+    <section style="display: block; padding: 20px">
+      <fieldset>
+        <legend>Table Editor</legend>
 
-      <div id="table"></div>
-      <button id="load-data" class="load-data">Load Data</button>
-      <button id="shuffle-data" class="shuffle-data">Shuffle Data</button>
+        <!-- Dropdown styled as Windows 98 -->
+        <div class="field-row" style="margin-bottom: 10px">
+          <label for="editing-method">Editing method:</label>
+          <select id="editing-method">
+            <option>Manual Entry</option>
+            <option>Load Default</option>
+            <option>Shuffle Data</option>
+          </select>
+        </div>
+
+        <!-- Table -->
+        <div id="table" style="margin: 10px 0"></div>
+
+        <!-- Buttons -->
+        <div class="field-row" style="gap: 8px">
+          <button id="load-data">Load Data</button>
+          <button id="shuffle-data">Shuffle Data</button>
+        </div>
+      </fieldset>
     </section>
 
     <!-- During Study -->
@@ -49,7 +63,7 @@
       </div>
     </section>
     <!-- Study Slider Section-->
-    <section>
+    <section style="display: none">
       <div class="field-row">
         <label for="text1">Participation ID: </label>
         <div class="field-border-disabled" style="padding: 5px">`$value`</div>
@@ -66,6 +80,120 @@
       </div>
     </section>
     <!-- Questionnaire Section-->
+    <section style="display: none">
+      <fieldset>
+        <p style="font-size: 14px">Please select a fitting canvas.</p>
+        <div class="field-row" style="gap: 8px">
+          <div class="field-row-stacked" style="width: 100%">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap">
+              <!-- Rise Canvas -->
+              <div style="flex: 1; min-width: 200px">
+                <div
+                  class="field-border-disabled"
+                  style="padding: 4px; cursor: pointer"
+                  id="rise"
+                  onclick="buttonFunctions('rise')"
+                >
+                  <canvas
+                    class="canvas"
+                    id="riseCanvas"
+                    width="200"
+                    height="200"
+                  ></canvas>
+                </div>
+              </div>
+
+              <!-- Fall Canvas -->
+              <div style="flex: 1; min-width: 200px">
+                <div
+                  class="field-border-disabled"
+                  style="padding: 4px; cursor: pointer"
+                  id="fall"
+                  onclick="buttonFunctions('fall')"
+                >
+                  <canvas
+                    class="canvas"
+                    id="fallCanvas"
+                    width="200"
+                    height="200"
+                  ></canvas>
+                </div>
+              </div>
+
+              <!-- Olymp Canvas -->
+              <div style="flex: 1; min-width: 200px">
+                <div
+                  class="field-border-disabled"
+                  style="padding: 4px; cursor: pointer"
+                  id="olymp"
+                  onclick="buttonFunctions('olymp')"
+                >
+                  <canvas
+                    class="canvas"
+                    id="olympCanvas"
+                    width="200"
+                    height="200"
+                  ></canvas>
+                </div>
+              </div>
+
+              <!-- Tartarus Canvas -->
+              <div style="flex: 1; min-width: 200px">
+                <div
+                  class="field-border-disabled"
+                  style="padding: 4px; cursor: pointer"
+                  id="tartarus"
+                  onclick="buttonFunctions('tartarus')"
+                >
+                  <canvas
+                    class="canvas"
+                    id="tartarusCanvas"
+                    width="200"
+                    height="200"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <p style="font-size: 14px">
+          Experiencing the haptic sensations was pleasant to me.
+        </p>
+        <div class="field-row" style="width: 800px">
+          <input id="pleasant" type="range" min="0" max="100" value="50" />
+        </div>
+        <div class="slider-labels">
+          <span>Strongly Disagree</span>
+          <span>Strongly Agree</span>
+        </div>
+      </fieldset>
+      <fieldset>
+        <p style="font-size: 14px">
+          The haptic interactions made me more focused.
+        </p>
+        <div class="field-row" style="width: 800px">
+          <input id="focus" type="range" min="0" max="100" value="50" />
+        </div>
+        <div class="slider-labels">
+          <span>Strongly Disagree</span>
+          <span>Strongly Agree</span>
+        </div>
+      </fieldset>
+      <fieldset>
+        <p style="font-size: 14px">
+          The haptic sensations resembled those I experience in real life.
+        </p>
+        <div class="field-row" style="width: 800px">
+          <input id="realism" type="range" min="0" max="100" value="50" />
+        </div>
+        <div class="slider-labels">
+          <span>Strongly Disagree</span>
+          <span>Strongly Agree</span>
+        </div>
+      </fieldset>
+    </section>
 
     <script src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     <script src="admin.js"></script>

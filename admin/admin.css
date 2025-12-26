@@ -7,57 +7,71 @@ body {
   background-color: #c0c0c0;
 }
 
-/* Dropdown Button */
-.dropbtn {
-  background-color: #3498db;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
+/* Tabulator Windows 98 Style */
+#table .tabulator {
+  border: 2px solid;
+  border-color: #dfdfdf #0a0a0a #0a0a0a #dfdfdf;
+  background-color: #c0c0c0;
+  font-family: "MS Sans Serif", sans-serif;
+  font-size: 11px;
 }
 
-/* Dropdown button on hover & focus */
-.dropbtn:hover,
-.dropbtn:focus {
-  background-color: #2980b9;
+#table .tabulator-header {
+  background-color: #c0c0c0;
+  border-bottom: 2px solid;
+  border-color: #dfdfdf #0a0a0a #0a0a0a #dfdfdf;
 }
 
-/* The container <div> - needed to position the dropdown content */
-.dropdown {
-  position: relative;
-  display: inline-block;
+#table .tabulator-col {
+  background-color: #c0c0c0;
+  border-right: 2px solid;
+  border-color: #fff #0a0a0a #0a0a0a #fff;
+  padding: 4px;
 }
 
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
+#table .tabulator-col-title {
+  font-weight: bold;
+  color: #000;
 }
 
-/* Links inside the dropdown */
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-/* Change color of dropdown links on hover */
-.dropdown-content a:hover {
-  background-color: #ddd;
-}
-
-/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {
-  display: block;
-}
 #table .tabulator-tableholder {
   overflow-x: hidden;
+  background-color: #fff;
+}
+
+#table .tabulator-row {
+  background-color: #fff;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+#table .tabulator-row:hover {
+  background-color: #000080 !important;
+  color: #fff !important;
+}
+
+#table .tabulator-row.tabulator-selected {
+  background-color: #000080 !important;
+  color: #fff !important;
+}
+
+#table .tabulator-cell {
+  padding: 4px;
+  border-right: 1px solid #c0c0c0;
+}
+
+/* Input fields in table */
+#table .tabulator-cell input {
+  background-color: #fff;
+  border: 2px solid;
+  border-color: #0a0a0a #dfdfdf #dfdfdf #0a0a0a;
+  padding: 2px;
+  font-family: "MS Sans Serif", sans-serif;
+  font-size: 11px;
+}
+
+/* Remove modern dropdown, use Windows 98 select */
+.dropdown {
+  display: none;
 }
 
 .window {
@@ -72,4 +86,44 @@ body {
 
 .window-body {
   font-size: 15px;
+}
+
+/*Slider*/
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Canvas */
+/* Canvas */
+.canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background-color: #c0c0c0;
+  image-rendering: pixelated;
+}
+
+.field-border-disabled {
+  transition: all 0.1s ease;
+  /* Raised button look (outset) */
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey,
+    inset 2px 2px #dfdfdf !important;
+}
+
+.field-border-disabled:hover {
+  /* Keep raised look on hover */
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey,
+    inset 2px 2px #dfdfdf !important;
+}
+
+.field-border-disabled:active,
+.field-border-disabled.pressed {
+  /* Pressed down look (inset) */
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf, inset 2px 2px grey !important;
 }
