@@ -26,6 +26,18 @@ body {
   gap: 20px;
 }
 
+/* Input Values */
+.input_values {
+  display: grid;
+  row-gap: 10px;
+}
+
+.min-max {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
+}
+
 /* Drawing Board */
 .drawing-board canvas {
   display: flex;
