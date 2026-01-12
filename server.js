@@ -12,6 +12,7 @@ const server = express();
 server.set("query parser", (str) => qs.parse(str, {}));
 server.use(cors());
 server.use(express.json());
+server.use(express.static(path.join(__dirname, "public")));
 
 // Create Data Directory
 const dataDir = path.join(__dirname, "data");
@@ -235,6 +236,14 @@ process.on("SIGINT", () => {
   } else {
     process.exit(0);
   }
+});
+
+server.get("/participant", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "participant.html"));
+});
+
+server.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
 // Start Server on Port 3000

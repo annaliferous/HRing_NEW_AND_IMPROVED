@@ -261,6 +261,11 @@ document.getElementById("shuffle-data").addEventListener("click", () => {
   table.setData(setupDataArray(1));
 });
 
+function startTrial() {
+  document.getElementById("editing-section").style.display = "none";
+  document.getElementById("calibration-screen").style.display = "block";
+}
+
 // !!!!!!! Participant View !!!!!!!!
 /* Calibration 
 while subject is calibration: Wait screen */
@@ -269,6 +274,16 @@ img.src = "assets/hourglass.gif";
 img.width = 50;
 img.height = 50;
 document.getElementById("hourglass").appendChild(img);
+
+function debug() {
+  document.getElementById("calibration-screen").style.display = "none";
+  document.getElementById("participant-slider").style.display = "block";
+}
+
+function debug2() {
+  document.getElementById("participant-slider").style.display = "none";
+  document.getElementById("questionnaire-screen").style.display = "block";
+}
 
 /*Study Slider 
 display PartID and Calibration Value*/
