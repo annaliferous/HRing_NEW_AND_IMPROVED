@@ -47,7 +47,6 @@ document.addEventListener("mouseup", endDrag);
 document.addEventListener("touchmove", drag);
 document.addEventListener("touchend", endDrag);
 
-// Data Function to send data in the CORRECT order, with Promises
 function fetchData(endpoint) {
   return new Promise((resolve, reject) => {
     fetch(endpoint)

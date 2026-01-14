@@ -1,4 +1,18 @@
 /* Pre-Study/Between-Study */
+const url = "http://localhost:3000/admin/";
+let shuffled;
+
+function fetchData(endpoint) {
+  return new Promise((resolve, reject) => {
+    fetch(endpoint)
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
 
 /* Drawing Table */
 const canvas = document.querySelector("canvas"),
@@ -82,8 +96,6 @@ canvas.addEventListener("pointercancel", stopDrawing);
 
 //Sending and calculating the values
 
-const url = "http://localhost:3000/save/";
-
 function calculateValue(e) {
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
@@ -109,6 +121,8 @@ function calculateValue(e) {
 /* Table */
 /* Initial data */
 //Random Seed creation
+let participationId = document.getElementById("id");
+let calibrationValue = null;
 let shuffledDataArray = [];
 
 function seededRandom(seed) {
@@ -143,7 +157,7 @@ const dataArray = [
 ];
 
 function setupDataArray(participantId) {
-  const shuffled = shuffleArray(dataArray, participantId);
+  shuffled = shuffleArray(dataArray, participantId);
 
   return shuffled.map((row) => ({
     id: row[0],
@@ -258,12 +272,14 @@ document.getElementById("load-data").addEventListener("click", () => {
 });
 
 document.getElementById("shuffle-data").addEventListener("click", () => {
-  table.setData(setupDataArray(1));
+  table.setData(setupDataArray(participationId));
 });
 
 function startTrial() {
-  document.getElementById("editing-section").style.display = "none";
-  document.getElementById("calibration-screen").style.display = "block";
+  fetchData(url + "shuffled" + shuffled).then(() => {
+    document.getElementById("editing-section").style.display = "none";
+    document.getElementById("calibration-screen").style.display = "block";
+  });
 }
 
 // !!!!!!! Participant View !!!!!!!!

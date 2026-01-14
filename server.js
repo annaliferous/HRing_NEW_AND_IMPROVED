@@ -213,6 +213,27 @@ server.get("/save/session", (req, res) => {
   res.send("Session saved!");
 });
 
+in Getting data
+server.get("/admin/state", (req, res) => {
+  res.json({
+    participationId,
+    calibrationValue,
+  });
+});
+
+//Admin sending data
+server.get("/shuffled/:shuffled", (req, res) => {
+  res.send(200);
+});
+//Partcicipant getting data
+server.get("/partcicipant/shuffled", (req, res) => {
+  res.json({
+    shuffled,
+  });
+});
+
+//Adm
+
 // Pico value handler
 server.get("/save/main/:value", (req, res) => {
   const picoValue = req.params.value;
