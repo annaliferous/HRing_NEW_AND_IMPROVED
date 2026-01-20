@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <link rel="stylesheet" href="/admin.css" />
   <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/98.css" />
-  <link rel="stylesheet" href="admin.css" />
+
   <title>HRing Trial Run</title>
 </head>
 
@@ -46,7 +46,7 @@
           </div>
 
           <div class="button-container">
-            <button id="applyValues" onclick="saveCanvas()">Apply</button>
+            <button id="applyValues" onclick="apply()">Apply</button>
           </div>
         </div>
       </fieldset>
@@ -222,6 +222,7 @@
   </section>
 
   <script src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script src="admin.js"></script>
 </body>
 

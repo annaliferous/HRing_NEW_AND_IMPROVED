@@ -4,18 +4,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="participant.css" />
+  <link rel="stylesheet" href="/participant.css" />
   <title>HRing Trial Run</title>
 </head>
 
 <body>
+  <!-- PreTrial -->
+  <div class="tenor-gif-embed" id="startScreen" data-postid="23777897" data-share-method="host"
+    data-aspect-ratio="1.35021" data-width="100%"><a href="https://tenor.com/view/clippy-gif-23777897">Clippy
+      Sticker</a>from <a href="https://tenor.com/search/clippy-stickers">Clippy Stickers</a></div>
+
   <!-- Calibration Screen -->
-  <section id="calibration" class="calibration">
+  <section id="calibration" class="calibration" style="display: none">
     <div class="container">
       <div class="outline">
-        <label for="participation_id">Participation ID:</label>
-        <input type="text" id="participation_id" maxlength="4" size="4" />
-        <br /><br />
 
         <div class="headline">
           <p>Please click "Send" when you start to feel any pressure</p>
@@ -125,7 +127,8 @@
     </div>
   </section>
 
-
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
   <script src="participant.js"></script>
 </body>
 

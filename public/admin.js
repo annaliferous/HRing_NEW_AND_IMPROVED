@@ -1,19 +1,16 @@
 /* Pre-Study/Between-Study */
+const socket = io();
 const url = "http://localhost:3000/admin/";
 let shuffled;
+let shuffledId = 0;
 
-function fetchData(endpoint) {
-  return new Promise((resolve, reject) => {
-    fetch(endpoint)
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+let participationIdInput = document.getElementById("id");
+let participantId = 0;
+let calibrationValue = null;
+
+function apply() {
+  participantId = parseInt(participationIdInput.value);
 }
-
 /* Drawing Table */
 const canvas = document.querySelector("canvas"),
   ctx = canvas.getContext("2d");
@@ -114,16 +111,13 @@ function calculateValue(e) {
     console.log("roundedPicoValue :", roundedPicoValue);
   }
   fetch(url + roundedPicoValue).catch((err) =>
-    console.error("Fetch error:", err)
+    console.error("Fetch error:", err),
   );
 }
 
 /* Table */
 /* Initial data */
 //Random Seed creation
-let participationId = document.getElementById("id");
-let calibrationValue = null;
-let shuffledDataArray = [];
 
 function seededRandom(seed) {
   let x = Math.sin(seed) * 10000;
@@ -230,7 +224,7 @@ const table = new Tabulator("#table", {
             max: "",
           },
           false,
-          row // insert after clicked row
+          row, // insert after clicked row
         );
       },
     },
@@ -272,14 +266,22 @@ document.getElementById("load-data").addEventListener("click", () => {
 });
 
 document.getElementById("shuffle-data").addEventListener("click", () => {
-  table.setData(setupDataArray(participationId));
+  table.setData(setupDataArray(participantId));
 });
 
+/* Shuffle Matrix send */
+function currentShuffleId(array) {
+  if (shuffledId >= shuffled.length) {
+    console.warn("Slider input ignored — experiment finished.");
+    return;
+  }
+}
+
 function startTrial() {
-  fetchData(url + "shuffled" + shuffled).then(() => {
-    document.getElementById("editing-section").style.display = "none";
-    document.getElementById("calibration-screen").style.display = "block";
-  });
+  socket.emit("startTrial");
+  socket.emit("First Data Array", shuffled[0]);
+  document.getElementById("editing-section").style.display = "none";
+  document.getElementById("calibration-screen").style.display = "block";
 }
 
 // !!!!!!! Participant View !!!!!!!!

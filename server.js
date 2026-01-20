@@ -1,24 +1,45 @@
 const express = require("express");
-const fs = require("fs");
+const http = require("http");
+const { Server } = require("socket.io");
 const path = require("path");
 const cors = require("cors");
 const qs = require("qs");
+const fs = require("fs");
 const { SerialPort } = require("serialport");
 const { ReadlineParser } = require("@serialport/parser-readline");
-const { rejects } = require("assert");
 
-const server = express();
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
-server.set("query parser", (str) => qs.parse(str, {}));
-server.use(cors());
-server.use(express.json());
-server.use(express.static(path.join(__dirname, "public")));
+app.use(express.json());
 
-// Create Data Directory
-const dataDir = path.join(__dirname, "data");
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+app.set("query parser", (str) => qs.parse(str, {}));
+app.use(cors());
+
+app.use(express.static(path.join(__dirname, "public")));
+
+/* admin gives okay to start Trial */
+
+io.on("connection", (socket) => {
+  /* console.log("Client connected:", socket.id); */
+
+  socket.on("startTrial", () => {
+    console.log("Trial started by admin");
+
+    socket.broadcast.emit("trialStarted");
+  });
+
+  socket.on("disconnect", () => {
+    /* console.log("Client disconnected:", socket.id); */
+  });
+});
+
+/* save values */
+app.post("/save/calibrationValue", (req, res) => {
+  const { value } = req.body;
+  res.json({ status: "ok" });
+});
 
 let port;
 let parser;
@@ -32,7 +53,7 @@ async function initializeSerial() {
     /* console.log("Available ports:", ports); */
 
     const picoPort = ports.find(
-      (p) => p.vendorId === "2e8a" // Raspberry Pi Pico vendor ID
+      (p) => p.vendorId === "2e8a", // Raspberry Pi Pico vendor ID
     );
 
     if (!picoPort) {
@@ -76,7 +97,6 @@ function sendToPico(value, mode) {
   const message = `${value}\n`;
   port.write(message, (err) => {
     if (err) console.error("Serial write failed:", err.message);
-    /* else console.log(`Sent to Pico [mode: ${mode}] → ${value}`); */
   });
 }
 //reset Motors after every mode chnage
@@ -85,71 +105,8 @@ function resetMotors() {
   sendToPico(0, currentMode);
 }
 
-// Data Storage
-let participationId = null;
-let calibrationValue = null;
-let currentMode = "unknown";
-
-//Data Storage
-let allSessions = [];
-let currentSession = createEmptySession();
-
-function createEmptySession() {
-  return {
-    mode: null,
-    startTime: null,
-    stopTime: null,
-    array: null,
-    canvas: null,
-    pleasant: null,
-    focus: null,
-    realism: null,
-  };
-}
-
-function safeSession() {
-  if (currentSession.mode !== null) {
-    const sessionArray = [
-      currentSession.mode,
-      currentSession.startTime,
-      currentSession.stopTime,
-      currentSession.array,
-      currentSession.canvas,
-      currentSession.pleasant,
-      currentSession.focus,
-      currentSession.realism,
-    ];
-    allSessions.push(sessionArray);
-    console.log(`Session saved:`, sessionArray);
-    console.log(`Total sessions: ${allSessions.length}`);
-    currentSession = createEmptySession();
-  }
-}
-
-function safeAllSession() {
-  const filePath = path.join(dataDir, "sessions.txt");
-
-  // Build content
-  let content = "";
-  content += `Participation ID: ${participationId || "N/A"}\n`;
-  content += `Calibration Value: ${calibrationValue || "N/A"}\n\n`;
-
-  content += "Sessions:\n";
-  allSessions.forEach((session, idx) => {
-    content += `Session ${idx + 1}: ${JSON.stringify(session)}\n`;
-  });
-
-  // Write to file
-  fs.writeFileSync(filePath, content, "utf8");
-  console.log(`All sessions saved to ${filePath}`);
-}
-
-// Express Routes
-server.get("/", (req, res) => {
-  res.send("Express server is up and running!");
-});
-//cal Val handler
-server.get("/save/calibrationMain/:currentCalVal", (req, res) => {
+// Pico value handler
+app.get("/save/calibrationMain/:currentCalVal", (req, res) => {
   const currentCalVal = req.params.currentCalVal;
   console.log(`Received Cal Value: ${currentCalVal} `);
 
@@ -157,93 +114,6 @@ server.get("/save/calibrationMain/:currentCalVal", (req, res) => {
 
   res.send("Cal Value received and sent");
 });
-
-server.get("/save/participationId/:id", (req, res) => {
-  res.send("ParticipationId was send!");
-  participationId = req.params.id;
-});
-
-server.get("/save/calibrationValue/:calVal", (req, res) => {
-  res.send("calibrationValue was send!");
-  calibrationValue = req.params.calVal;
-});
-server.get("/save/index/:index", (req, res) => {
-  res.send("index was send!");
-  currentSession.index = req.params.index;
-});
-
-server.get("/save/startTime/:start", (req, res) => {
-  res.send("startTime was send!");
-  currentSession.startTime = req.params.start;
-});
-server.get("/save/stopTime/:stop", (req, res) => {
-  res.send("stopTime was send!");
-  currentSession.stopTime = req.params.stop;
-});
-server.get("/save/array/:array", (req, res) => {
-  res.send("ConditionArray was send!");
-  currentSession.array = req.params.array;
-});
-server.get("/save/mode/:mode", (req, res) => {
-  const newMode = req.params.mode;
-  currentMode = newMode;
-  currentSession.mode = newMode;
-  console.log(`Mode changed → ${currentMode}`);
-  res.send("Mode updated");
-  resetMotors();
-});
-server.get("/save/canvas/:selectedCanvas", (req, res) => {
-  res.send("selectedCanvas was send!");
-  currentSession.canvas = req.params.selectedCanvas;
-});
-server.get("/save/pleasant/:pleasant", (req, res) => {
-  res.send("Pleasant was send!");
-  currentSession.pleasant = req.params.pleasant;
-});
-server.get("/save/focus/:focus", (req, res) => {
-  res.send("Focus was send!");
-  currentSession.focus = req.params.focus;
-});
-server.get("/save/realism/:realism", (req, res) => {
-  res.send("Realism was send!");
-  currentSession.realism = req.params.realism;
-});
-server.get("/save/session", (req, res) => {
-  safeSession();
-  res.send("Session saved!");
-});
-
-in Getting data
-server.get("/admin/state", (req, res) => {
-  res.json({
-    participationId,
-    calibrationValue,
-  });
-});
-
-//Admin sending data
-server.get("/shuffled/:shuffled", (req, res) => {
-  res.send(200);
-});
-//Partcicipant getting data
-server.get("/partcicipant/shuffled", (req, res) => {
-  res.json({
-    shuffled,
-  });
-});
-
-//Adm
-
-// Pico value handler
-server.get("/save/main/:value", (req, res) => {
-  const picoValue = req.params.value;
-  console.log(`Received Pico Value: ${picoValue} [mode: ${currentMode}]`);
-
-  sendToPico(picoValue, currentMode);
-
-  res.send("Pico Value received and sent");
-});
-
 // Shutdown
 process.on("SIGINT", () => {
   console.log("Shutting down server...");
@@ -259,11 +129,11 @@ process.on("SIGINT", () => {
   }
 });
 
-server.get("/participant", (req, res) => {
+app.get("/participant", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "participant.html"));
 });
 
-server.get("/admin", (req, res) => {
+app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 

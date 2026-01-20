@@ -1,11 +1,11 @@
 // Initial SetUp
+const startSection = document.getElementById("startScreen");
 const calibrationSection = document.getElementById("calibration");
 const screenSection = document.getElementById("screen");
 const questionnaireSection = document.getElementById("questionnaire");
 
 const calibrationSlider = document.getElementById("calibration_slider");
 const screenSlider = document.getElementById("screen_slider");
-const participationIdInput = document.getElementById("participation_id");
 const calibrationOutput = document.getElementById("demo");
 
 const pleasant_slider = document.getElementById("pleasant_slider");
@@ -14,10 +14,17 @@ const realism_slider = document.getElementById("realism_slider");
 
 const url = "http://localhost:3000/save/";
 
+const socket = io();
+/* start Trial! */
+socket.once("trialStarted", () => {
+  console.log("Trial started!");
+
+  startSection.style.display = "none";
+  calibrationSection.style.display = "block";
+});
+
 let startTime, stopTime;
 let calibrationValue = 0;
-let participationId = 0;
-let participation_id_matrix = 0;
 let shuffledConditionMatrix = [];
 let currentModeIndex = 0;
 
@@ -47,43 +54,31 @@ document.addEventListener("mouseup", endDrag);
 document.addEventListener("touchmove", drag);
 document.addEventListener("touchend", endDrag);
 
-function fetchData(endpoint) {
-  return new Promise((resolve, reject) => {
-    fetch(endpoint)
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-}
-
 // Calibration
 calibrationSlider.addEventListener("input", () => {
   calibrationOutput.textContent = calibrationSlider.value;
   let currentCalVal = calibrationSlider.value;
-  let sendCurrentCalVal = url + "calibrationMain/" + currentCalVal;
-  console.log(`Current CalVal "${currentCalVal}"`);
-  fetch(sendCurrentCalVal).catch((err) => console.error("Fetch error:", err));
+  fetch(`${url}calibrationMain/${currentCalVal}`).catch((err) =>
+    console.error("Live calibration error:", err),
+  );
 });
+
+async function sendCalibrationValue(value) {
+  const response = await fetch(`${url}calibrationValue`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ value }), // send value in body
+  });
+  if (!response.ok)
+    throw new Error(`Server responded with status ${response.status}`);
+  return await response.json();
+}
+
 document.getElementById("calibration_send").addEventListener("click", () => {
-  if (!participationIdInput.value) {
-    alert("Please enter a Participation ID!");
-    return;
-  }
   calibrationValue = parseInt(calibrationSlider.value);
-  participationId = parseInt(participationIdInput.value);
 
-  setupConditionMatrix(participationId);
-
-  fetchData(url + "participationId/" + participationId)
-    .then(() => fetchData(url + "calibrationValue/" + calibrationValue))
+  sendCalibrationValue(calibrationValue)
     .then(() => choosePath())
-    .then(() => {
-      calibrationSection.style.display = "none";
-      screenSection.style.display = "block";
-    })
     .catch((err) => {
       console.error("Error in calibration setup:", err);
     });
@@ -144,50 +139,12 @@ screenSlider.addEventListener("input", () => {
   fetch(endpoint).catch((err) => console.error("Fetch error:", err));
 });
 
-//Random Seed creation
-function seededRandom(seed) {
-  let x = Math.sin(seed) * 10000;
-  return x - Math.floor(x);
-}
-
-function shuffleArray(array, seed) {
-  const arr = array.slice();
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(seededRandom(seed + i) * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-const conditionMatrix = [
-  [0, "up", 0, 100],
-  [1, "up", 25, 100],
-  [2, "up", 50, 100],
-  [3, "up", 75, 100],
-  [4, "down", 0, 100],
-  [5, "down", 25, 100],
-  [6, "down", 50, 100],
-  [7, "down", 75, 100],
-  [8, "olymp", 0, 100],
-  [9, "olymp", 25, 100],
-  [10, "olymp", 50, 100],
-  [11, "olymp", 75, 100],
-  [12, "tartarus", 0, 100],
-  [13, "tartarus", 25, 100],
-  [14, "tartarus", 50, 100],
-  [15, "tartarus", 75, 100],
-];
-
-function setupConditionMatrix(participantId) {
-  shuffledConditionMatrix = shuffleArray(conditionMatrix, participantId);
-}
-
 function choosePath() {
   if (currentModeIndex >= shuffledConditionMatrix.length) {
     console.warn("choosePath() ignored — experiment finished.");
     return;
   }
 
-  /* const currentMode = modeMatrix[participation_id_matrix][currentModeIndex]; */
   const currentCondition = shuffledConditionMatrix[currentModeIndex];
   fetchData(url + "array/" + currentCondition);
   const currentMode = currentCondition[1]; // "up", "down", "olymp", "tartarus"
@@ -222,7 +179,7 @@ function realTimeCalculation() {
 
   const currentMode = currentCondition[1]; // "up", "down", "olymp", or "tartarus"
   console.log(
-    `🧮 Index: ${currentIndex} | Mode: ${currentMode} | Max Pico: ${max_pico_value} | Min Pico: ${min_pico_value}`
+    `🧮 Index: ${currentIndex} | Mode: ${currentMode} | Max Pico: ${max_pico_value} | Min Pico: ${min_pico_value}`,
   );
 
   if (currentMode === "down") {
@@ -350,7 +307,7 @@ let selectedCanvas = null; // Variable to track the selected canvas
 // Enter Buttons
 
 const canvas_section_container = document.getElementById(
-  "canvas_section_container"
+  "canvas_section_container",
 );
 
 const pleasant_send = document.getElementById("pleasant_send");
