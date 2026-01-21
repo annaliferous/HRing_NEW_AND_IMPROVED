@@ -1,8 +1,8 @@
 /* Pre-Study/Between-Study */
 const socket = io();
 const url = "http://localhost:3000/admin/";
-let shuffled;
-let shuffledId = 0;
+let shuffled = [];
+let currentShuffledIndex = 0;
 
 let participationIdInput = document.getElementById("id");
 let participantId = 0;
@@ -38,6 +38,15 @@ const setCanvasBackground = () => {
   drawCenterLine();
 };
 
+const getCanvasCoordinates = (e) => {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    /* extracts viewport coordinates from canvas position*/
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top,
+  };
+};
+
 const startDrawing = (e) => {
   if (e.pressure === 0) return;
   canvas.setPointerCapture(e.pointerId);
@@ -45,12 +54,16 @@ const startDrawing = (e) => {
   ctx.save();
   ctx.setLineDash([]);
   ctx.beginPath();
+
+  const coords = getCanvasCoordinates(e);
+  ctx.moveTo(coords.x, coords.y);
   calculateValue(e);
 };
 
 const drawing = (e) => {
   if (!isDrawing || e.pressure === 0) return;
-  ctx.lineTo(e.clientX, e.clientY);
+  const coords = getCanvasCoordinates(e);
+  ctx.lineTo(coords.x, coords.y);
   ctx.stroke();
   calculateValue(e);
 };
@@ -270,16 +283,20 @@ document.getElementById("shuffle-data").addEventListener("click", () => {
 });
 
 /* Shuffle Matrix send */
-function currentShuffleId(array) {
-  if (shuffledId >= shuffled.length) {
-    console.warn("Slider input ignored — experiment finished.");
+function approveCurrentTrial() {
+  if (currentShuffledIndex >= shuffled.length) {
+    console.warn("No more trials");
     return;
   }
-}
 
-function startTrial() {
+  const trial = shuffled[currentShuffledIndex];
+
+  socket.emit("sendTrial", trial);
+  currentShuffledIndex++;
+}
+async function startTrial() {
   socket.emit("startTrial");
-  socket.emit("First Data Array", shuffled[0]);
+  approveCurrentTrial();
   document.getElementById("editing-section").style.display = "none";
   document.getElementById("calibration-screen").style.display = "block";
 }
@@ -402,4 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/* Drawing Board */
+/* final approval screen */
+function debug4() {
+  approveCurrentTrial();
+}

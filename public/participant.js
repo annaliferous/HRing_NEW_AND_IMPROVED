@@ -67,7 +67,7 @@ async function sendCalibrationValue(value) {
   const response = await fetch(`${url}calibrationValue`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ value }), // send value in body
+    body: JSON.stringify({ value }),
   });
   if (!response.ok)
     throw new Error(`Server responded with status ${response.status}`);

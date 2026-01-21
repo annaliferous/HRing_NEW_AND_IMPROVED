@@ -30,6 +30,12 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("trialStarted");
   });
 
+  socket.on("sendTrial", (trial) => {
+    console.log("Trial approved by admin:", trial);
+
+    socket.broadcast.emit("trialData", trial);
+  });
+
   socket.on("disconnect", () => {
     /* console.log("Client disconnected:", socket.id); */
   });
