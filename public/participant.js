@@ -25,8 +25,8 @@ socket.once("trialStarted", () => {
 
 let startTime, stopTime;
 let calibrationValue = 0;
-let shuffledConditionMatrix = [];
-let currentModeIndex = 0;
+let currentTrial = null;
+let currentTrialIndex = 0;
 
 // Slider Drag for touch (no lagging)
 let isDragging = false;
@@ -76,22 +76,52 @@ async function sendCalibrationValue(value) {
 
 document.getElementById("calibration_send").addEventListener("click", () => {
   calibrationValue = parseInt(calibrationSlider.value);
+  socket.emit("finishedCalibration");
 
-  sendCalibrationValue(calibrationValue)
-    .then(() => choosePath())
-    .catch((err) => {
-      console.error("Error in calibration setup:", err);
-    });
+  screenSection.style.display = "block";
+  calibrationSection.style.display = "none";
 });
 
 // Screen Slider
+/* Get Trial data */
+socket.on("trialData", (trial) => {
+  console.log("Received trial from admin:", trial);
+  currentTrial = trial;
+
+  screenSlider.value = 0;
+  pleasant_slider.value = 50;
+  focus_slider.value = 50;
+  realism_slider.value = 50;
+
+  screenSection.style.display = "block";
+  questionnaireSection.style.display = "none";
+  console.log(
+    "Trial ready - ID:",
+    trial.id,
+    "Mode:",
+    trial.mode,
+    "Min:",
+    trial.min,
+    "Max:",
+    trial.max,
+  );
+});
 screenSlider.addEventListener("mousedown", () => {
+  if (!currentTrial) {
+    console.warn("No trial array data available");
+    return;
+  }
+
   startTime = Date.now();
-  /* fetch(url + "startTime/" + startTime); */
-  fetchData(url + "startTime/" + startTime);
+  socket.emit("startTime", startTime);
 });
 
 screenSlider.addEventListener("mouseup", () => {
+  if (!currentTrial) {
+    console.warn("No trial array available");
+    return;
+  }
+
   let mouseUpPromise = new Promise((resolve, reject) => {
     if (screenSlider.value >= 99) {
       resolve();
@@ -99,13 +129,12 @@ screenSlider.addEventListener("mouseup", () => {
       reject();
     }
   });
+
   mouseUpPromise
     .then(() => {
-      choosePath();
-    })
-    .then(() => {
       stopTime = Date.now();
-      fetch(url + "stopTime/" + stopTime);
+      socket.emit("stopTime", stopTime);
+      socket.emit("showQuestionnaire");
 
       setTimeout(() => {
         screenSlider.value = 0;
@@ -125,62 +154,33 @@ screenSlider.addEventListener("mouseup", () => {
 });
 
 screenSlider.addEventListener("input", () => {
-  if (currentModeIndex >= shuffledConditionMatrix.length) {
-    console.warn("Slider input ignored — experiment finished.");
+  if (!currentTrial) {
+    console.warn("Slider input ignored — no trial array.");
     return;
   }
+  /* Value for Admin */
+
+  socket.emit("sliderValue", screenSlider.value);
+  /* Value for Pico */
   const picoValue = realTimeCalculation();
-
-  const currentCondition = shuffledConditionMatrix[currentModeIndex];
-  const currentMode = currentCondition[1]; // "up", "down", "olymp", "tartarus"
-
-  const endpoint = url + "main/" + picoValue;
-  console.log(`Mode "${currentMode}" → PicoValue: ${picoValue}`);
-  fetch(endpoint).catch((err) => console.error("Fetch error:", err));
+  socket.emit("picoValue", picoValue);
 });
-
-function choosePath() {
-  if (currentModeIndex >= shuffledConditionMatrix.length) {
-    console.warn("choosePath() ignored — experiment finished.");
-    return;
-  }
-
-  const currentCondition = shuffledConditionMatrix[currentModeIndex];
-  fetchData(url + "array/" + currentCondition);
-  const currentMode = currentCondition[1]; // "up", "down", "olymp", "tartarus"
-  console.log(`Starting mode: ${currentMode}`);
-  fetchData(url + "mode/" + currentMode);
-}
-
-function nextMode() {
-  if (currentModeIndex < shuffledConditionMatrix.length - 1) {
-    currentModeIndex++;
-    choosePath();
-    screenSection.style.display = "block";
-    questionnaireSection.style.display = "none";
-  } else {
-    alert("Experiment finished. Thank you!");
-    calibrationSection.style.display = "none";
-    screenSection.style.display = "none";
-    questionnaireSection.style.display = "none";
-  }
-}
 
 // ===== CALCULATION =====
 function realTimeCalculation() {
+  if (!currentTrial) {
+    console.warn("No current trial data");
+    return 0;
+  }
+
   const sliderValue = parseInt(screenSlider.value);
-  const currentCondition = shuffledConditionMatrix[currentModeIndex];
-  const currentIndex = currentCondition[0];
-  const min_pico_value = Number(currentCondition[2]) + Number(calibrationValue);
-  const max_pico_value = Number(currentCondition[3]) + Number(calibrationValue);
+  const calibrationVal = calibrationValue || 0;
+  const min_pico_value = Number(currentTrial.min) + calibrationVal;
+  const max_pico_value = Number(currentTrial.max) + calibrationVal;
+  const currentMode = currentTrial.mode;
 
   let actualPicoValue =
     min_pico_value + (sliderValue / 100) * (max_pico_value - min_pico_value);
-
-  const currentMode = currentCondition[1]; // "up", "down", "olymp", or "tartarus"
-  console.log(
-    `🧮 Index: ${currentIndex} | Mode: ${currentMode} | Max Pico: ${max_pico_value} | Min Pico: ${min_pico_value}`,
-  );
 
   if (currentMode === "down") {
     actualPicoValue = max_pico_value - (actualPicoValue - min_pico_value);
@@ -325,21 +325,39 @@ const realism_container = document.getElementById("realism_container");
 function buttonFunctions(canvas) {
   pleasant_container.scrollIntoView({ behavior: "smooth" });
   selectedCanvas = canvas;
+  socket.emit("canvas", selectedCanvas);
   console.log(selectedCanvas);
 }
+
+/* Pleasant Slider  Functionality*/
+pleasant_slider.addEventListener("input", () => {
+  socket.emit("pleasantUpdate", pleasant_slider.value);
+});
 
 pleasant_send.addEventListener("click", () => {
   focus_container.scrollIntoView({ behavior: "smooth" });
 });
+
 pleasant_return.addEventListener("click", () => {
   canvas_section_container.scrollIntoView({ behavior: "smooth" });
+});
+/* Focus Slider Functionality */
+
+focus_slider.addEventListener("input", () => {
+  socket.emit("focusUpdate", focus_slider.value);
 });
 
 focus_send.addEventListener("click", () => {
   realism_container.scrollIntoView({ behavior: "smooth" });
 });
+
 focus_return.addEventListener("click", () => {
   pleasant_container.scrollIntoView({ behavior: "smooth" });
+});
+
+/* Realism Slider Functionaloty */
+realism_slider.addEventListener("input", () => {
+  socket.emit("realismUpdate", realism_slider.value);
 });
 
 realism_return.addEventListener("click", () => {
@@ -351,17 +369,64 @@ realism_send.addEventListener("click", () => {
   let focus = focus_slider.value;
   let realism = realism_slider.value;
 
+  socket.emit("finishedQuestionnaire", {
+    canvas: selectedCanvas,
+    pleasant: pleasant,
+    focus: focus,
+    realism: realism,
+    trialId: currentTrial?.id,
+    timestamp: Date.now(),
+  });
+  showWaitingScreen();
+
   // Send questionnaire data to backend
-  fetchData(url + "canvas/" + selectedCanvas)
+  /* fetchData(url + "canvas/" + selectedCanvas)
     .then(() => fetchData(url + "pleasant/" + pleasant))
     .then(() => fetchData(url + "focus/" + focus))
     .then(() => fetchData(url + "realism/" + realism))
     .then(() => fetchData(url + "session"))
     .then(() => {
-      nextMode();
+      questionnaireSection.style.display = "none";
+      showWaitingScreen();
     })
 
     .catch((err) => {
       console.error("Error sending questionnaire data:", err);
-    });
+    }); */
+});
+
+async function fetchData(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response;
+}
+
+function showWaitingScreen() {
+  const waitingSection = document.getElementById("waitingScreen");
+  if (waitingSection) {
+    questionnaireSection.style.display = "none";
+    waitingSection.style.display = "block";
+  }
+  console.log("Waiting for admin approval...");
+}
+
+socket.on("trialData", (trial) => {
+  const waitingSection = document.getElementById("waitingScreen");
+  if (waitingSection) {
+    waitingSection.style.display = "none";
+  }
+});
+
+/* Waiting Screen */
+document.addEventListener("DOMContentLoaded", () => {
+  let waitingImg = document.createElement("img");
+  waitingImg.src = "assets/hourglass.gif";
+  waitingImg.width = 50;
+  waitingImg.height = 50;
+  const waitingHourglassEl = document.getElementById("waiting-hourglass");
+  if (waitingHourglassEl) {
+    waitingHourglassEl.appendChild(waitingImg);
+  }
 });

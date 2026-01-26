@@ -105,7 +105,7 @@ canvas.addEventListener("pointerup", stopDrawing);
 canvas.addEventListener("pointercancel", stopDrawing);
 
 //Sending and calculating the values
-
+/* 
 function calculateValue(e) {
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
@@ -127,7 +127,7 @@ function calculateValue(e) {
     console.error("Fetch error:", err),
   );
 }
-
+ */
 /* Table */
 /* Initial data */
 //Random Seed creation
@@ -279,24 +279,29 @@ document.getElementById("load-data").addEventListener("click", () => {
 });
 
 document.getElementById("shuffle-data").addEventListener("click", () => {
-  table.setData(setupDataArray(participantId));
+  apply();
+  shuffled = setupDataArray(participantId);
+  table.setData(shuffled);
+  currentShuffledIndex = 0; // Reset index
+  console.log("Shuffled trials:", shuffled);
 });
 
 /* Shuffle Matrix send */
-function approveCurrentTrial() {
-  if (currentShuffledIndex >= shuffled.length) {
-    console.warn("No more trials");
+
+async function startTrial() {
+  apply();
+  const tableData = table.getData();
+  if (tableData.length === 0) {
+    alert("Please load or create trial data first!");
     return;
   }
 
-  const trial = shuffled[currentShuffledIndex];
+  shuffled = tableData;
+  currentShuffledIndex = 0;
 
-  socket.emit("sendTrial", trial);
-  currentShuffledIndex++;
-}
-async function startTrial() {
+  console.log("Starting trial with data:", shuffled);
+
   socket.emit("startTrial");
-  approveCurrentTrial();
   document.getElementById("editing-section").style.display = "none";
   document.getElementById("calibration-screen").style.display = "block";
 }
@@ -309,6 +314,13 @@ img.src = "assets/hourglass.gif";
 img.width = 50;
 img.height = 50;
 document.getElementById("hourglass").appendChild(img);
+
+socket.on("finishedCalibration", () => {
+  console.log("Calibration finished ADMIN");
+  approveCurrentTrial();
+  document.getElementById("calibration-screen").style.display = "none";
+  document.getElementById("participant-slider").style.display = "block";
+});
 
 function debug() {
   document.getElementById("calibration-screen").style.display = "none";
@@ -323,8 +335,18 @@ function debug2() {
 /*Study Slider 
 display PartID and Calibration Value*/
 
-/* Questionnaire */
-/* Canvases */
+const participantSlider = document.getElementById("range23");
+socket.on("sliderValue", (value) => {
+  console.log("Particpant Slider Value received:", value);
+  participantSlider.value = value;
+});
+
+socket.on("showQuestionnaire", () => {
+  document.getElementById("participant-slider").style.display = "none";
+  document.getElementById("questionnaire-screen").style.display = "block";
+});
+
+/* Questionnaire - UI */
 // Coordinates
 const canvasData = {
   rise: { x1: 150, y1: 150, x2: 150, y2: 50, x3: 50, y3: 150 },
@@ -422,4 +444,179 @@ document.addEventListener("DOMContentLoaded", () => {
 /* final approval screen */
 function debug4() {
   approveCurrentTrial();
+}
+
+/* Questionnaire - Functionality */
+socket.on("showQuestionnaire", () => {
+  console.log("Participant showing questionnaire");
+  document.getElementById("participant-slider").style.display = "none";
+  document.getElementById("questionnaire-screen").style.display = "block";
+});
+
+// Update canvas selection in real-time
+socket.on("canvas", (canvasName) => {
+  console.log("Participant selected canvas:", canvasName);
+
+  document.querySelectorAll(".canvas").forEach((c) => {
+    c.parentElement.style.border = "";
+  });
+  const selectedCanvasEl = document.getElementById(`${canvasName}Canvas`);
+  if (selectedCanvasEl) {
+    selectedCanvasEl.parentElement.style.border = "3px solid blue";
+  }
+});
+
+// Update pleasant slider in real-time
+socket.on("pleasantUpdate", (value) => {
+  const pleasantSlider = document.getElementById("pleasant");
+  if (pleasantSlider) {
+    pleasantSlider.value = value;
+  }
+});
+
+// Update focus slider in real-time
+socket.on("focusUpdate", (value) => {
+  const focusSlider = document.getElementById("focus");
+  if (focusSlider) {
+    focusSlider.value = value;
+  }
+});
+
+// Update realism slider in real-time
+socket.on("realismUpdate", (value) => {
+  const realismSlider = document.getElementById("realism");
+  if (realismSlider) {
+    realismSlider.value = value;
+  }
+});
+
+// Participant finished questionnaire
+socket.on("finishedQuestionnaire", () => {
+  console.log("Participant finished questionnaire - showing approval screen");
+  document.getElementById("questionnaire-screen").style.display = "none";
+  document.getElementById("approve-section").style.display = "block";
+
+  loadTrialDataForApproval();
+});
+
+function loadTrialDataForApproval() {
+  if (currentShuffledIndex >= shuffled.length) {
+    console.warn("All trials completed!");
+    alert("All trials completed!");
+    document.getElementById("approve-section").style.display = "none";
+    document.getElementById("editing-section").style.display = "block";
+    return;
+  }
+
+  const nextTrial = shuffled[currentShuffledIndex];
+
+  // Populate trial edit fields
+  document.getElementById("edit-trial-id").value = nextTrial.id;
+  document.getElementById("edit-trial-mode").value = nextTrial.mode;
+  document.getElementById("edit-trial-min").value = nextTrial.min;
+  document.getElementById("edit-trial-max").value = nextTrial.max;
+
+  // Update trial counter
+  document.getElementById("trial-counter").textContent =
+    `Trial ${currentShuffledIndex + 1} of ${shuffled.length}`;
+}
+
+/* Approval and Next Trial */
+function approveCurrentTrial() {
+  if (currentShuffledIndex >= shuffled.length) {
+    console.warn("All trials completed!");
+    alert("All trials completed!");
+    document.getElementById("approve-section").style.display = "none";
+    document.getElementById("editing-section").style.display = "block";
+    resetViews();
+    return;
+  }
+  const trial = {
+    id: parseInt(document.getElementById("edit-trial-id").value),
+    mode: document.getElementById("edit-trial-mode").value,
+    min: parseInt(document.getElementById("edit-trial-min").value),
+    max: parseInt(document.getElementById("edit-trial-max").value),
+  };
+
+  shuffled[currentShuffledIndex] = trial;
+
+  console.log(
+    `Sending trial ${currentShuffledIndex + 1}/${shuffled.length}:`,
+    trial,
+  );
+
+  socket.emit("sendTrial", trial);
+  currentShuffledIndex++;
+
+  // Reset questionnaire view
+  resetViews();
+
+  // Hide approval screen, show participant slider
+  document.getElementById("approve-section").style.display = "none";
+  document.getElementById("participant-slider").style.display = "block";
+}
+
+function resetViews() {
+  // Reset canvas highlights
+  selectedCanvasName = null;
+  document.querySelectorAll(".canvas").forEach((c) => {
+    c.parentElement.style.border = "";
+  });
+
+  // Reset sliders to default
+  const pleasantSlider = document.getElementById("pleasant");
+  const focusSlider = document.getElementById("focus");
+  const realismSlider = document.getElementById("realism");
+
+  if (pleasantSlider) pleasantSlider.value = 50;
+  if (focusSlider) focusSlider.value = 50;
+  if (realismSlider) realismSlider.value = 50;
+
+  // Reset approval screen displays
+  const canvasDisplay = document.getElementById("selected-canvas-display");
+  const pleasantDisplay = document.getElementById("pleasant-value-display");
+  const focusDisplay = document.getElementById("focus-value-display");
+  const realismDisplay = document.getElementById("realism-value-display");
+
+  if (canvasDisplay) canvasDisplay.textContent = "-";
+  if (pleasantDisplay) pleasantDisplay.textContent = "50";
+  if (focusDisplay) focusDisplay.textContent = "50";
+  if (realismDisplay) realismDisplay.textContent = "50";
+
+  console.log("Questionnaire view reset");
+}
+
+/* Approval Functionality */
+
+// Additional helper functions for approval screen
+function skipTrial() {
+  if (confirm("Are you sure you want to skip this trial?")) {
+    console.log(`Skipping trial ${currentShuffledIndex + 1}`);
+    currentShuffledIndex++;
+
+    if (currentShuffledIndex >= shuffled.length) {
+      alert("All trials completed!");
+      document.getElementById("approve-section").style.display = "none";
+      document.getElementById("editing-section").style.display = "block";
+      resetQuestionnaireView();
+    } else {
+      // Load next trial for approval
+      loadTrialDataForApproval();
+    }
+  }
+}
+
+function endStudy() {
+  if (
+    confirm(
+      "Are you sure you want to end the study? This will stop all remaining trials.",
+    )
+  ) {
+    console.log("Study ended by admin");
+    currentShuffledIndex = shuffled.length; // Set to end
+    document.getElementById("approve-section").style.display = "none";
+    document.getElementById("editing-section").style.display = "block";
+    resetQuestionnaireView();
+    alert("Study ended. You can start a new study from the editing section.");
+  }
 }

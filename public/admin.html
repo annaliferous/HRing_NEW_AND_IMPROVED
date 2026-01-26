@@ -222,10 +222,87 @@
   </section>
   <!-- approve next trial -->
   <section class="approve-section" id="approve-section" style="display: none;">
-    <div class="button-container">
-      <button id="debug3" onclick="debug4()">start</button>
-    </div>
+    <div class="window" style="width: 600px; margin: 20px auto;">
+      <div class="title-bar">
+        <div class="title-bar-text">Approve Next Trial</div>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize"></button>
+          <button aria-label="Maximize"></button>
+          <button aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="window-body">
+        <h3 id="trial-counter" style="margin-bottom: 20px;">Trial X of Y</h3>
 
+        <!-- Trial Data Editor -->
+        <fieldset style="margin-bottom: 20px;">
+          <legend>Edit Next Trial Data</legend>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label for="edit-trial-id" style="width: 100px;">Trial ID:</label>
+            <input id="edit-trial-id" type="number" style="width: 200px;" />
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label for="edit-trial-mode" style="width: 100px;">Mode:</label>
+            <select id="edit-trial-mode" style="width: 200px;">
+              <option value="up">Up</option>
+              <option value="down">Down</option>
+              <option value="olymp">Olymp</option>
+              <option value="tartarus">Tartarus</option>
+            </select>
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label for="edit-trial-min" style="width: 100px;">Min Value:</label>
+            <input id="edit-trial-min" type="number" style="width: 200px;" />
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label for="edit-trial-max" style="width: 100px;">Max Value:</label>
+            <input id="edit-trial-max" type="number" style="width: 200px;" />
+          </div>
+        </fieldset>
+
+        <!-- Questionnaire Summary (Read-only) -->
+        <fieldset style="margin-bottom: 20px;">
+          <legend>Participant's Questionnaire Responses</legend>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Selected Canvas:</label>
+            <div id="selected-canvas-display" class="field-border-disabled" style="padding: 5px; width: 150px;">
+              -
+            </div>
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Pleasant:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 100px;">
+              <span id="pleasant-value-display">50</span>
+            </div>
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Focus:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 100px;">
+              <span id="focus-value-display">50</span>
+            </div>
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Realism:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 100px;">
+              <span id="realism-value-display">50</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Action Buttons -->
+        <div class="button-container" style="display: flex; gap: 10px; justify-content: center;">
+          <button onclick="approveCurrentTrial()">
+            Approve & Send Next Trial
+          </button>
+          <button onclick="skipTrial()">
+            Skip This Trial
+          </button>
+          <button onclick="endStudy()">
+            End Study
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 
   <script src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>

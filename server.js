@@ -24,6 +24,7 @@ app.use(express.static(path.join(__dirname, "public")));
 io.on("connection", (socket) => {
   /* console.log("Client connected:", socket.id); */
 
+  /* Admin */
   socket.on("startTrial", () => {
     console.log("Trial started by admin");
 
@@ -34,6 +35,77 @@ io.on("connection", (socket) => {
     console.log("Trial approved by admin:", trial);
 
     socket.broadcast.emit("trialData", trial);
+  });
+
+  /* Participant */
+  socket.on("finishedCalibration", () => {
+    console.log("Calibration finished!");
+
+    socket.broadcast.emit("finishedCalibration");
+  });
+  socket.on("showQuestionnaire", () => {
+    socket.broadcast.emit("showQuestionnaire");
+  });
+
+  /* Slider Value for Admin*/
+  socket.on("sliderValue", (value) => {
+    console.log("Slider Value:", value);
+    socket.broadcast.emit("sliderValue", value);
+  });
+  /* Slider Value for Pico */
+  socket.on("picoValue", (value) => {
+    console.log("Pico Value:", value);
+
+    sendToPico(value, "slider");
+  });
+
+  socket.on("startTime", (timestamp) => {
+    console.log("Participant started trial at:", timestamp);
+  });
+
+  socket.on("stopTime", (timestamp) => {
+    console.log("Participant stopped trial at:", timestamp);
+  });
+
+  socket.on("trialCompleted", (data) => {
+    console.log("Participant completed trial:", data);
+    // Notify admin that participant is ready
+    socket.broadcast.emit("participantReady", data);
+  });
+
+  socket.on("canvas", (canvas) => {
+    console.log("Participant selected canvas:", canvas);
+    socket.broadcast.emit("canvas", canvas);
+  });
+
+  // Pleasant slider update
+  socket.on("pleasantUpdate", (value) => {
+    console.log("Pleasant slider:", value);
+    socket.broadcast.emit("pleasantUpdate", value);
+  });
+
+  // Focus slider update
+  socket.on("focusUpdate", (value) => {
+    console.log("Focus slider:", value);
+    socket.broadcast.emit("focusUpdate", value);
+  });
+
+  // Realism slider update
+  socket.on("realismUpdate", (value) => {
+    console.log("Realism slider:", value);
+    socket.broadcast.emit("realismUpdate", value);
+  });
+
+  // Participant finished questionnaire
+  socket.on("finishedQuestionnaire", (data) => {
+    console.log("Participant finished questionnaire:", data);
+    socket.broadcast.emit("finishedQuestionnaire", data);
+  });
+
+  // Trial completed
+  socket.on("trialCompleted", (data) => {
+    console.log("Participant completed trial:", data);
+    socket.broadcast.emit("participantReady", data);
   });
 
   socket.on("disconnect", () => {
@@ -123,7 +195,6 @@ app.get("/save/calibrationMain/:currentCalVal", (req, res) => {
 // Shutdown
 process.on("SIGINT", () => {
   console.log("Shutting down server...");
-  safeAllSession();
 
   if (port && port.isOpen) {
     port.close(() => {

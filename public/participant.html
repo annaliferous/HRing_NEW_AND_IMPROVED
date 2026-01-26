@@ -126,7 +126,24 @@
       </div>
     </div>
   </section>
-
+  <!-- Waiting Screen -->
+  <section class="waiting-screen" id="waitingScreen" style="display: none">
+    <div class="window" style="width: 400px; margin: 100px auto;">
+      <div class="title-bar">
+        <div class="title-bar-text">Please Wait</div>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize"></button>
+          <button aria-label="Maximize"></button>
+          <button aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="window-body" style="text-align: center; padding: 30px;">
+        <div id="waiting-hourglass"></div>
+        <p style="margin-top: 20px;">Waiting for the experimenter to approve the next trial...</p>
+        <p style="font-size: 12px; color: #666;">Please remain seated and ready.</p>
+      </div>
+    </div>
+  </section>
   <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
   <script src="participant.js"></script>
