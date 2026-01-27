@@ -8,8 +8,20 @@ let participationIdInput = document.getElementById("id");
 let participantId = 0;
 let calibrationValue = null;
 
-function apply() {
-  participantId = parseInt(participationIdInput.value);
+let dataFormat = null; // "table" or "canvas"
+
+function apply(format) {
+  dataFormat = format;
+
+  if (format === "table") {
+    participantId = parseInt(participationIdInput.value);
+    console.log("Applied table data");
+  }
+
+  if (format === "canvas") {
+    convertDrawnPointsToArray();
+    console.log("Applied canvas data");
+  }
 }
 /* Drawing Table */
 const canvas = document.querySelector("canvas"),
@@ -142,30 +154,6 @@ canvas.addEventListener("pointermove", drawing);
 canvas.addEventListener("pointerup", stopDrawing);
 canvas.addEventListener("pointercancel", stopDrawing);
 
-/* Covert drawn data points */
-function convertDrawnPointsToTable() {
-  if (drawnPoints.length === 0) {
-    alert("No points drawn yet!");
-    return [];
-  }
-
-  const normalizedData = drawnPoints.map((point, index) => {
-    const xNormalized = Math.round((point.x / canvas.width) * X_RANGE);
-
-    const yNormalized = Math.round(
-      ((canvas.height - point.y) / canvas.height) * Y_RANGE,
-    );
-
-    return {
-      id: index + 1,
-      x: Math.max(0, Math.min(X_RANGE, xNormalized)),
-      y: Math.max(0, Math.min(Y_RANGE, yNormalized)),
-      timestamp: point.timestamp || Date.now(),
-    };
-  });
-
-  return normalizedData;
-}
 function convertDrawnPointsToArray() {
   if (drawnPoints.length === 0) {
     alert("No points drawn yet!");
@@ -347,35 +335,44 @@ document.getElementById("shuffle-data").addEventListener("click", () => {
   table.setData(shuffled);
   currentShuffledIndex = 0; // Reset index
   console.log("Shuffled trials:", shuffled);
-
-  /* const pointsArray = convertDrawnPointsToArray();
-
-  if (pointsArray.length === 0) return;
-
-  console.log("Sending drawn points:", pointsArray);
-
-  // Send via socket
-  socket.emit("drawnPoints", pointsArray);
-
-  alert(`Sent ${pointsArray.length} points to server`); */
 });
 
 /* Shuffle Matrix send */
 
 async function startTrial() {
-  apply();
-  const tableData = table.getData();
-  if (tableData.length === 0) {
-    alert("Please load or create trial data first!");
+  if (!dataFormat) {
+    alert("Please apply either table data or drawn points first!");
     return;
   }
 
-  shuffled = tableData;
-  currentShuffledIndex = 0;
+  if (dataFormat === "table") {
+    const tableData = table.getData();
 
-  console.log("Starting trial with data:", shuffled);
+    if (tableData.length === 0) {
+      alert("Please load or create trial data first!");
+      return;
+    }
 
-  socket.emit("startTrial");
+    shuffled = tableData;
+    currentShuffledIndex = 0;
+
+    console.log("Starting trial with table data:", shuffled);
+    socket.emit("startTrial", shuffled);
+  }
+
+  if (dataFormat === "canvas") {
+    const pointsArray = convertDrawnPointsToArray();
+
+    if (pointsArray.length === 0) {
+      alert("Please draw something first!");
+      return;
+    }
+
+    console.log("Sending drawn points:", pointsArray);
+    socket.emit("drawnPoints", pointsArray);
+    socket.emit("startTrial");
+  }
+
   document.getElementById("editing-section").style.display = "none";
   document.getElementById("calibration-screen").style.display = "block";
 }

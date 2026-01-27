@@ -95,16 +95,9 @@ socket.on("trialData", (trial) => {
 
   screenSection.style.display = "block";
   questionnaireSection.style.display = "none";
-  console.log(
-    "Trial ready - ID:",
-    trial.id,
-    "Mode:",
-    trial.mode,
-    "Min:",
-    trial.min,
-    "Max:",
-    trial.max,
-  );
+  if (receivedDrawnPoints.length > 0) {
+    sendCanvasAsSliderSequence();
+  }
 });
 screenSlider.addEventListener("mousedown", () => {
   if (!currentTrial) {
@@ -167,15 +160,37 @@ screenSlider.addEventListener("input", () => {
   fetch(`${url}main/${picoValue}`);
   socket.emit("picoValue", picoValue);
 });
+/* canvas */
+let receivedDrawnPoints = [];
+
+socket.on("points", (points) => {
+  console.log("Participant received drawn points:", points);
+  receivedDrawnPoints = points;
+});
+function convertDrawnPointsToSliderValues() {
+  if (!receivedDrawnPoints || receivedDrawnPoints.length === 0) {
+    alert("No canvas points received yet!");
+    return [];
+  }
+
+  return receivedDrawnPoints.map((point) => {
+    // point.x is already normalized 0–100 from admin
+    const sliderValue = Math.round(point.x);
+    return Math.max(0, Math.min(100, sliderValue));
+  });
+}
 
 // ===== CALCULATION =====
-function realTimeCalculation() {
+function realTimeCalculation(sliderValueOverride = null) {
   if (!currentTrial) {
     console.warn("No current trial data");
     return 0;
   }
 
-  const sliderValue = parseInt(screenSlider.value);
+  const sliderValue =
+    sliderValueOverride !== null
+      ? parseInt(sliderValueOverride)
+      : parseInt(screenSlider.value);
   const calibrationVal = calibrationValue || 0;
   const min_pico_value = Number(currentTrial.min) + calibrationVal;
   const max_pico_value = Number(currentTrial.max) + calibrationVal;
@@ -205,6 +220,25 @@ function realTimeCalculation() {
   }
 
   return Math.round(actualPicoValue);
+}
+async function sendCanvasAsSliderSequence() {
+  const sliderValues = convertDrawnPointsToSliderValues();
+  if (sliderValues.length === 0) return;
+
+  console.log("Streaming canvas as slider values:", sliderValues.length);
+
+  const STEP_DELAY_MS = 30;
+
+  for (const sliderValue of sliderValues) {
+    const picoValue = realTimeCalculation(sliderValue);
+
+    socket.emit("picoValue", picoValue);
+    fetch(`${url}main/${picoValue}`).catch(console.error);
+
+    await sleep(STEP_DELAY_MS);
+  }
+
+  console.log("Finished canvas playback.");
 }
 
 // Questionnaire

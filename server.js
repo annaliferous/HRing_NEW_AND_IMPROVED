@@ -41,11 +41,9 @@ io.on("connection", (socket) => {
     console.log("Received drawn points from admin:", points);
     console.log(`Total points: ${points.length}`);
 
-    // Broadcast to participant if needed
-    socket.broadcast.emit("drawnPoints", points);
+    socket.broadcast.emit("points", points);
 
     // Or save to file
-    saveDrawnPointsToFile(points);
   });
 
   /* Participant */
