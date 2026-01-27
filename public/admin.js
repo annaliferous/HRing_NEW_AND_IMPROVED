@@ -105,29 +105,7 @@ canvas.addEventListener("pointerup", stopDrawing);
 canvas.addEventListener("pointercancel", stopDrawing);
 
 //Sending and calculating the values
-/* 
-function calculateValue(e) {
-  const rect = canvas.getBoundingClientRect();
-  const y = e.clientY - rect.top;
-  console.log("y:", y);
 
-  let picoValue = 0;
-  let roundedPicoValue = Math.round(picoValue);
-
-  if (y <= canvas.height / 2) {
-    picoValue = y * (-180 / (canvas.height / 2));
-    roundedPicoValue = Math.round(picoValue);
-    console.log("roundedPicoValue :", roundedPicoValue);
-  } else {
-    picoValue = (y - canvas.height / 2) * (180 / (canvas.height / 2));
-    roundedPicoValue = Math.round(picoValue);
-    console.log("roundedPicoValue :", roundedPicoValue);
-  }
-  fetch(url + roundedPicoValue).catch((err) =>
-    console.error("Fetch error:", err),
-  );
-}
- */
 /* Table */
 /* Initial data */
 //Random Seed creation

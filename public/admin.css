@@ -76,7 +76,7 @@ fieldset {
   justify-content: center;
   width: 100%;
   max-width: 800px;
-  height: auto;
+  max-height: 800px;
   aspect-ratio: 4 / 3;
   border: 1px solid black;
   touch-action: none;
@@ -187,21 +187,30 @@ fieldset {
 .field-border-disabled {
   transition: all 0.1s ease;
   /* Raised button look (outset) */
-  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey,
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #fff,
+    inset -2px -2px grey,
     inset 2px 2px #dfdfdf !important;
 }
 
 .field-border-disabled:hover {
   /* Keep raised look on hover */
-  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey,
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #fff,
+    inset -2px -2px grey,
     inset 2px 2px #dfdfdf !important;
 }
 
 .field-border-disabled:active,
 .field-border-disabled.pressed {
   /* Pressed down look (inset) */
-  box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a,
-    inset -2px -2px #dfdfdf, inset 2px 2px grey !important;
+  box-shadow:
+    inset -1px -1px #fff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px grey !important;
 }
 
 /* Responsive layout */
