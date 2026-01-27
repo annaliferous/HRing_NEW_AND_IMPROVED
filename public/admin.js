@@ -19,24 +19,51 @@ const canvas = document.querySelector("canvas"),
 let prevX,
   prevY,
   isDrawing = false,
-  selectedColor = "#000";
+  selectedColor = "#000",
+  drawnPoints = [];
 
-function drawCenterLine() {
-  ctx.save();
-  ctx.setLineDash([10, 15]);
-  ctx.beginPath();
-  ctx.moveTo(0, canvas.height / 2);
-  ctx.lineTo(canvas.width, canvas.height / 2);
-  ctx.stroke();
-  ctx.restore();
-}
+const X_RANGE = 100; // 0-100
+const Y_RANGE = 120; // 0-120 (degrees)
 
 const setCanvasBackground = () => {
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = selectedColor;
-  drawCenterLine();
+  drawGrid();
 };
+function drawGrid() {
+  ctx.save();
+  ctx.strokeStyle = "#ddd";
+  ctx.lineWidth = 1;
+
+  // Vertical lines (every 10 x-units)
+  for (let i = 0; i <= 10; i++) {
+    const x = (i / 10) * canvas.width;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+
+  // Horizontal lines (every 12 y-units ≈ 10 degrees)
+  for (let i = 0; i <= 10; i++) {
+    const y = (i / 10) * canvas.height;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+
+  // Draw axis labels
+  ctx.fillStyle = "#666";
+  ctx.font = "12px Arial";
+  ctx.fillText("0", 5, canvas.height - 5);
+  ctx.fillText("100", canvas.width - 30, canvas.height - 5);
+  ctx.fillText("120°", 5, 15);
+  ctx.fillText("0°", 5, canvas.height - 20);
+
+  ctx.restore();
+}
 
 const getCanvasCoordinates = (e) => {
   const rect = canvas.getBoundingClientRect();
@@ -46,6 +73,15 @@ const getCanvasCoordinates = (e) => {
     y: e.clientY - rect.top,
   };
 };
+function calculateValue(e) {
+  const coords = getCanvasCoordinates(e);
+
+  drawnPoints.push({
+    x: coords.x,
+    y: coords.y,
+    timestamp: Date.now(),
+  });
+}
 
 const startDrawing = (e) => {
   if (e.pressure === 0) return;
@@ -69,18 +105,20 @@ const drawing = (e) => {
 };
 
 const stopDrawing = (e) => {
-  if (e.pressure === 0) return;
-  if (e.clientX >= canvas.width) {
-    canvas.releasePointerCapture(e.pointerId);
-    ctx.closePath();
-    ctx.restore();
-    isDrawing = false;
-    calculateValue(e);
-  }
+  /* f (e.pressure === 0) return; */
+  if (!isDrawing) return;
+
+  canvas.releasePointerCapture(e.pointerId);
+  ctx.closePath();
+  ctx.restore();
+  isDrawing = false;
+  calculateValue(e);
+  console.log("Drawing stopped. Total points:", drawnPoints.length);
 };
 
 function clearCanvas() {
   setCanvasBackground();
+  drawnPoints = [];
 }
 
 function saveCanvas() {
@@ -103,6 +141,53 @@ canvas.addEventListener("pointerdown", startDrawing);
 canvas.addEventListener("pointermove", drawing);
 canvas.addEventListener("pointerup", stopDrawing);
 canvas.addEventListener("pointercancel", stopDrawing);
+
+/* Covert drawn data points */
+function convertDrawnPointsToTable() {
+  if (drawnPoints.length === 0) {
+    alert("No points drawn yet!");
+    return [];
+  }
+
+  const normalizedData = drawnPoints.map((point, index) => {
+    const xNormalized = Math.round((point.x / canvas.width) * X_RANGE);
+
+    const yNormalized = Math.round(
+      ((canvas.height - point.y) / canvas.height) * Y_RANGE,
+    );
+
+    return {
+      id: index + 1,
+      x: Math.max(0, Math.min(X_RANGE, xNormalized)),
+      y: Math.max(0, Math.min(Y_RANGE, yNormalized)),
+      timestamp: point.timestamp || Date.now(),
+    };
+  });
+
+  return normalizedData;
+}
+function convertDrawnPointsToArray() {
+  if (drawnPoints.length === 0) {
+    alert("No points drawn yet!");
+    return [];
+  }
+
+  const normalizedData = drawnPoints.map((point, index) => {
+    const xNormalized = Math.round((point.x / canvas.width) * X_RANGE);
+    const yNormalized = Math.round(
+      ((canvas.height - point.y) / canvas.height) * Y_RANGE,
+    );
+
+    return {
+      id: index + 1,
+      x: Math.max(0, Math.min(X_RANGE, xNormalized)),
+      y: Math.max(0, Math.min(Y_RANGE, yNormalized)),
+      timestamp: point.timestamp || Date.now(),
+    };
+  });
+
+  return normalizedData;
+}
 
 //Sending and calculating the values
 
@@ -262,6 +347,17 @@ document.getElementById("shuffle-data").addEventListener("click", () => {
   table.setData(shuffled);
   currentShuffledIndex = 0; // Reset index
   console.log("Shuffled trials:", shuffled);
+
+  /* const pointsArray = convertDrawnPointsToArray();
+
+  if (pointsArray.length === 0) return;
+
+  console.log("Sending drawn points:", pointsArray);
+
+  // Send via socket
+  socket.emit("drawnPoints", pointsArray);
+
+  alert(`Sent ${pointsArray.length} points to server`); */
 });
 
 /* Shuffle Matrix send */

@@ -158,11 +158,13 @@ screenSlider.addEventListener("input", () => {
     console.warn("Slider input ignored — no trial array.");
     return;
   }
+
   /* Value for Admin */
 
   socket.emit("sliderValue", screenSlider.value);
   /* Value for Pico */
   const picoValue = realTimeCalculation();
+  fetch(`${url}main/${picoValue}`);
   socket.emit("picoValue", picoValue);
 });
 

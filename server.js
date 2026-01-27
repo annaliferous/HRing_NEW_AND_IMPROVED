@@ -36,6 +36,17 @@ io.on("connection", (socket) => {
 
     socket.broadcast.emit("trialData", trial);
   });
+  /* Drawn Points */
+  socket.on("drawnPoints", (points) => {
+    console.log("Received drawn points from admin:", points);
+    console.log(`Total points: ${points.length}`);
+
+    // Broadcast to participant if needed
+    socket.broadcast.emit("drawnPoints", points);
+
+    // Or save to file
+    saveDrawnPointsToFile(points);
+  });
 
   /* Participant */
   socket.on("finishedCalibration", () => {
@@ -56,7 +67,7 @@ io.on("connection", (socket) => {
   socket.on("picoValue", (value) => {
     console.log("Pico Value:", value);
 
-    sendToPico(value, "slider");
+    sendToPico(value);
   });
 
   socket.on("startTime", (timestamp) => {
@@ -166,7 +177,7 @@ async function initializeSerial() {
   }
 }
 
-function sendToPico(value, mode) {
+function sendToPico(value) {
   if (!port || !port.isOpen) {
     console.warn("Serial port not open — cannot send");
     return;
@@ -180,7 +191,7 @@ function sendToPico(value, mode) {
 //reset Motors after every mode chnage
 function resetMotors() {
   console.log("Resetting motors to 0...");
-  sendToPico(0, currentMode);
+  sendToPico(0);
 }
 
 // Pico value handler
@@ -188,9 +199,16 @@ app.get("/save/calibrationMain/:currentCalVal", (req, res) => {
   const currentCalVal = req.params.currentCalVal;
   console.log(`Received Cal Value: ${currentCalVal} `);
 
-  sendToPico(currentCalVal, "calVal");
+  sendToPico(currentCalVal);
 
   res.send("Cal Value received and sent");
+});
+
+app.get("/save/main/:picoValue", (req, res) => {
+  const picoValue = req.params.picoValue;
+  console.log(`Received Value: ${picoValue} `);
+
+  sendToPico(picoValue);
 });
 // Shutdown
 process.on("SIGINT", () => {
