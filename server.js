@@ -47,10 +47,10 @@ io.on("connection", (socket) => {
   });
 
   /* Participant */
-  socket.on("finishedCalibration", () => {
+  socket.on("finishedCalibration", (value) => {
     console.log("Calibration finished!");
 
-    socket.broadcast.emit("finishedCalibration");
+    socket.broadcast.emit("finishedCalibration", value);
   });
   socket.on("showQuestionnaire", () => {
     socket.broadcast.emit("showQuestionnaire");

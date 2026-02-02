@@ -83,7 +83,7 @@ async function sendCalibrationValue(value) {
 
 document.getElementById("calibration_send").addEventListener("click", () => {
   calibrationValue = parseInt(calibrationSlider.value);
-  socket.emit("finishedCalibration");
+  socket.emit("finishedCalibration", calibrationValue);
 
   screenSection.style.display = "block";
   calibrationSection.style.display = "none";

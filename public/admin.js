@@ -387,7 +387,7 @@ img.height = 50;
 document.getElementById("hourglass").appendChild(img);
 
 socket.on("finishedCalibration", (value) => {
-  calculateValue = value;
+  calibrationValue = value;
   console.log("Calibration finished ADMIN");
   approveCurrentTrial();
   document.getElementById("calibration-screen").style.display = "none";
@@ -406,45 +406,29 @@ function debug2() {
 
 /*Study Slider 
 display PartID and Calibration Value*/
-
 function updateParticipantSliderDisplay() {
-  // Update participant ID
-  const displayParticipantId = document.getElementById(
-    "display-participant-id",
-  );
-  if (displayParticipantId) {
-    displayParticipantId.textContent = participantId || "-";
-  }
+  document.getElementById("display-participant-id").textContent =
+    participantId || "-";
 
-  // Update calibration value
-  const displayCalibrationValue = document.getElementById(
-    "display-calibration-value",
-  );
-  if (displayCalibrationValue) {
-    displayCalibrationValue.textContent =
-      calibrationValue !== null ? calibrationValue : "-";
-  }
+  document.getElementById("display-calibration-value").textContent =
+    calibrationValue ?? "-";
 
-  // Update current trial data if available
-  if (currentShuffledIndex > 0 && currentShuffledIndex <= shuffled.length) {
-    const currentTrial = shuffled[currentShuffledIndex - 1];
+  const currentTrial = shuffled[currentShuffledIndex];
 
-    const displayTrialId = document.getElementById("display-trial-id");
-    const displayTrialMode = document.getElementById("display-trial-mode");
-    const displayTrialMin = document.getElementById("display-trial-min");
-    const displayTrialMax = document.getElementById("display-trial-max");
+  if (!currentTrial) return;
 
-    if (displayTrialId) displayTrialId.textContent = currentTrial.id;
-    if (displayTrialMode) displayTrialMode.textContent = currentTrial.mode;
-    if (displayTrialMin) displayTrialMin.textContent = currentTrial.min;
-    if (displayTrialMax) displayTrialMax.textContent = currentTrial.max;
-  }
+  document.getElementById("display-trial-id").textContent = currentTrial.id;
+  document.getElementById("display-trial-mode").textContent = currentTrial.mode;
+  document.getElementById("display-trial-min").textContent = currentTrial.min;
+  document.getElementById("display-trial-max").textContent = currentTrial.max;
 }
 
 const participantSlider = document.getElementById("range23");
 socket.on("sliderValue", (value) => {
   console.log("Particpant Slider Value received:", value);
   participantSlider.value = value;
+  const display = document.getElementById("display-slider-value");
+  if (display) display.textContent = value;
 });
 
 socket.on("showQuestionnaire", () => {
@@ -654,10 +638,10 @@ function approveCurrentTrial() {
   socket.emit("sendTrial", trial);
   currentShuffledIndex++;
 
+  updateParticipantSliderDisplay();
   // Reset questionnaire view
   resetViews();
 
-  // Hide approval screen, show participant slider
   document.getElementById("approve-section").style.display = "none";
   document.getElementById("participant-slider").style.display = "block";
 }
