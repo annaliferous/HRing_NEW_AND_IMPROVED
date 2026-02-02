@@ -46,7 +46,7 @@
           </div>
 
           <div class="button-container">
-            <button id="applyTable" onclick="apply('table')">Apply Table</button>
+            <button id="applyTable" onclick="apply('table')">Apply</button>
           </div>
         </div>
       </fieldset>
@@ -119,25 +119,83 @@
   <!-- Study Slider Section-->
 
   <section class="participant-slider" id="participant-slider" style="display: none">
-    <fieldset>
-      <p>Please move the slider</p>
-      <div class="field-row">
-        <label for="text1">Participation ID: </label>
-        <div class="field-border-disabled" style="padding: 5px">`$value`</div>
-        <label for="text2">Calibration Value: </label>
-        <div class="field-border-disabled" style="padding: 5px">`$value`</div>
+    <div class="window" style="width: 600px; margin: 20px auto;">
+      <div class="title-bar">
+        <div class="title-bar-text">Participant Trial In Progress</div>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize"></button>
+          <button aria-label="Maximize"></button>
+          <button aria-label="Close"></button>
+        </div>
       </div>
-      <div class="field-row">
-        <label for="text3">Current Data: </label>
-        <div class="field-border-disabled" style="padding: 5px">`$value`</div>
-      </div>
+      <div class="window-body">
+        <p style="font-size: 14px; margin-bottom: 20px;">Please wait while the participant adjusts the slider</p>
 
-      <div class="field-row" style="width: 800px">
-        <input id="range23" type="range" min="0" max="100" value="0" />
+        <!-- Session Information -->
+        <fieldset style="margin-bottom: 20px;">
+          <legend>Session Information</legend>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Participant ID:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 200px;">
+              <span id="display-participant-id">-</span>
+            </div>
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Calibration Value:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 200px;">
+              <span id="display-calibration-value">-</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Current Trial Data -->
+        <fieldset style="margin-bottom: 20px;">
+          <legend>Current Trial Data</legend>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Trial ID:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 100px;">
+              <span id="display-trial-id">-</span>
+            </div>
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Mode:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 100px;">
+              <span id="display-trial-mode">-</span>
+            </div>
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Min Value:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 100px;">
+              <span id="display-trial-min">-</span>
+            </div>
+          </div>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Max Value:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 100px;">
+              <span id="display-trial-max">-</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Slider Value Display -->
+        <fieldset style="margin-bottom: 20px;">
+          <legend>Participant Slider Position</legend>
+          <div class="field-row" style="margin-bottom: 10px;">
+            <label style="width: 150px;">Current Value:</label>
+            <div class="field-border-disabled" style="padding: 5px; width: 100px;">
+              <span id="display-slider-value">0</span>
+            </div>
+          </div>
+          <div class="field-row" style="width: 100%">
+            <input id="range23" type="range" min="0" max="100" value="0" disabled style="width: 100%;" />
+          </div>
+        </fieldset>
+
+        <!-- Debug Button -->
+        <div class="button-container" style="display: flex; gap: 10px; justify-content: center;">
+          <button id="debug2" onclick="debug2()">Debug: Skip to Questionnaire</button>
+        </div>
       </div>
-    </fieldset>
-    <div class="button-container">
-      <button id="debug2" onclick="debug2()">start</button>
     </div>
   </section>
 
@@ -183,42 +241,54 @@
         </div>
       </div>
     </fieldset>
-    <fieldset>
-      <p style="font-size: 14px">
-        Experiencing the haptic sensations was pleasant to me.
-      </p>
-      <div class="field-row" style="width: 800px">
-        <input id="pleasant" type="range" min="0" max="100" value="50" />
-      </div>
-      <div class="slider-labels">
-        <span>Strongly Disagree</span>
-        <span>Strongly Agree</span>
-      </div>
-    </fieldset>
-    <fieldset>
-      <p style="font-size: 14px">
-        The haptic interactions made me more focused.
-      </p>
-      <div class="field-row" style="width: 800px">
-        <input id="focus" type="range" min="0" max="100" value="50" />
-      </div>
-      <div class="slider-labels">
-        <span>Strongly Disagree</span>
-        <span>Strongly Agree</span>
-      </div>
-    </fieldset>
-    <fieldset>
-      <p style="font-size: 14px">
-        The haptic sensations resembled those I experience in real life.
-      </p>
-      <div class="field-row" style="width: 800px">
-        <input id="realism" type="range" min="0" max="100" value="50" />
-      </div>
-      <div class="slider-labels">
-        <span>Strongly Disagree</span>
-        <span>Strongly Agree</span>
-      </div>
-    </fieldset>
+    <div class="container" id="pleasant_container">
+      <fieldset>
+        <div class="headline">
+          <p>Experiencing the haptic sensations was pleasant to me.</p>
+        </div>
+        <div class="field-row" style="width: 800px">
+          <input id="pleasant" type="range" min="0" max="100" value="50" />
+        </div>
+        <div class="slider-labels">
+          <span>Strongly Disagree</span>
+          <span>Strongly Agree</span>
+        </div>
+      </fieldset>
+    </div>
+
+
+    <div class="container" id="focus_container">
+      <fieldset>
+        <div class="headline">
+          <p>The haptic interactions made me more focused.</p>
+        </div>
+        <div class="field-row" style="width: 800px">
+          <input id="focus" type="range" min="0" max="100" value="50" />
+        </div>
+        <div class="slider-labels">
+          <span>Strongly Disagree</span>
+          <span>Strongly Agree</span>
+        </div>
+      </fieldset>
+    </div>
+
+
+    <div class="container" id="realism_container">
+      <fieldset>
+        <div class="headline">
+          <p>
+            The haptic sensations resembled those I experience in real life.
+          </p>
+        </div>
+        <div class="field-row" style="width: 800px">
+          <input id="realism" type="range" min="0" max="100" value="50" />
+        </div>
+        <div class="slider-labels">
+          <span>Strongly Disagree</span>
+          <span>Strongly Agree</span>
+        </div>
+      </fieldset>
+    </div>
   </section>
   <!-- approve next trial -->
   <section class="approve-section" id="approve-section" style="display: none;">

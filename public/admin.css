@@ -3,6 +3,7 @@ body {
   min-height: 100vh;
   background-color: #c0c0c0;
   padding: 20px;
+  font-family: "MS Sans Serif", sans-serif;
 }
 
 fieldset {
@@ -203,6 +204,10 @@ fieldset {
     inset 2px 2px #dfdfdf !important;
 }
 
+.container {
+  padding: 20px;
+}
+
 .field-border-disabled:active,
 .field-border-disabled.pressed {
   /* Pressed down look (inset) */
@@ -213,6 +218,18 @@ fieldset {
     inset 2px 2px grey !important;
 }
 
+/* Headline */
+.headline {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.headline p {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #000;
+  margin: 0;
+}
 /* Responsive layout */
 @media (max-width: 1200px) {
   .editing-section {

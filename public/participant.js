@@ -23,6 +23,13 @@ socket.once("trialStarted", () => {
   calibrationSection.style.display = "block";
 });
 
+/* Waiting screen */
+let img = document.createElement("img");
+img.src = "assets/hourglass.gif";
+img.width = 50;
+img.height = 50;
+document.getElementById("hourglass").appendChild(img);
+
 let startTime, stopTime;
 let calibrationValue = 0;
 let currentTrial = null;
