@@ -8,6 +8,9 @@ const fs = require("fs");
 const { SerialPort } = require("serialport");
 const { ReadlineParser } = require("@serialport/parser-readline");
 
+/* Database */
+const sqlite3 = require("sqlite3").verbose();
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -18,6 +21,35 @@ app.set("query parser", (str) => qs.parse(str, {}));
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, "public")));
+
+/* Data base creation */
+const db = new sqlite3.Database("trials.db", (err) => {
+  if (err) console.error(err.message);
+  else console.log("SQLite ready");
+});
+db.run("PRAGMA journal_mode = WAL;");
+db.run(`
+  CREATE TABLE IF NOT EXISTS trials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    participantId TEXT NOT NULL,
+
+    trialNumber INTEGER,
+
+    calibration INTEGER,
+
+    startTime INTEGER,
+    stopTime INTEGER,
+
+    canvas TEXT,
+
+    pleasant INTEGER,
+    focus INTEGER,
+    realism INTEGER,
+
+    createdAt TEXT DEFAULT (datetime('now'))
+  )
+`);
 
 /* admin gives okay to start Trial */
 
@@ -42,8 +74,6 @@ io.on("connection", (socket) => {
     console.log(`Total points: ${points.length}`);
 
     socket.broadcast.emit("points", points);
-
-    // Or save to file
   });
 
   /* Participant */
@@ -114,6 +144,36 @@ io.on("connection", (socket) => {
   // Trial completed
   socket.on("trialCompleted", (data) => {
     console.log("Participant completed trial:", data);
+    const sql = `
+    INSERT INTO trials
+    (participantId, trialNumber, calibration,
+     startTime, stopTime, canvas,
+     pleasant, focus, realism)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+    const values = [
+      data.participantId,
+      data.trialNumber,
+      data.calibrationValue,
+
+      data.startTime,
+      data.stopTime,
+
+      data.canvas,
+
+      data.pleasant,
+      data.focus,
+      data.realism,
+    ];
+
+    db.run(sql, values, function (err) {
+      if (err) {
+        console.error("Save failed:", err.message);
+      } else {
+        console.log("Saved trial", this.lastID);
+      }
+    });
     socket.broadcast.emit("participantReady", data);
   });
 
@@ -212,14 +272,15 @@ app.get("/save/main/:picoValue", (req, res) => {
 process.on("SIGINT", () => {
   console.log("Shutting down server...");
 
-  if (port && port.isOpen) {
-    port.close(() => {
-      console.log("Serial port closed");
+  db.close(() => {
+    console.log("SQLite closed");
+
+    if (port && port.isOpen) {
+      port.close(() => process.exit(0));
+    } else {
       process.exit(0);
-    });
-  } else {
-    process.exit(0);
-  }
+    }
+  });
 });
 
 app.get("/participant", (req, res) => {

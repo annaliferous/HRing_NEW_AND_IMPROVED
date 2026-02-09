@@ -678,7 +678,6 @@ function resetViews() {
 
 /* Approval Functionality */
 
-// Additional helper functions for approval screen
 function skipTrial() {
   if (confirm("Are you sure you want to skip this trial?")) {
     console.log(`Skipping trial ${currentShuffledIndex + 1}`);
