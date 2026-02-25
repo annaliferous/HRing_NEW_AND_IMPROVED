@@ -1,16 +1,14 @@
 /* Pre-Study/Between-Study */
 const socket = io();
-const url = "http://localhost:3000/admin/";
+
 let shuffled = [];
 let currentShuffledIndex = 0;
 
 let participationIdInput = document.getElementById("id");
-let participantId = 0;
-let calibrationValue = null;
-
+let participantId = null;
 let dataFormat = null; // "table" or "canvas"
 
-function apply(format) {
+/* function apply(format) {
   dataFormat = format;
 
   if (format === "table") {
@@ -22,7 +20,38 @@ function apply(format) {
     convertDrawnPointsToArray();
     console.log("Applied canvas data");
   }
+} */
+
+async function apply(format) {
+  participantId = participationIdInput.value.trim();
+  console.log("participantId:", participantId);
+
+  if (!participantId) {
+    alert("Enter Participant ID");
+    return;
+  }
+
+  // Create participant row in DB, store the auto-increment id
+  const res = await fetch("/db/participant", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ participantCode: participantId }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    console.error("Server error:", err);
+    alert("Failed to create participant");
+    return;
+  }
+
+  const data = await res.json();
+  window.currentParticipantDbId = data.id;
+
+  dataFormat = format;
+  console.log(`Participant "${participantId}" created with DB id ${data.id}`);
 }
+
 /* Drawing Table */
 const canvas = document.querySelector("canvas"),
   ctx = canvas.getContext("2d");
@@ -181,7 +210,7 @@ function convertDrawnPointsToArray() {
 
 /* Table */
 /* Initial data */
-//Random Seed creation
+/* Random Seed creation */
 
 function seededRandom(seed) {
   let x = Math.sin(seed) * 10000;
@@ -196,23 +225,6 @@ function shuffleArray(array, seed) {
   }
   return arr;
 }
-const dataArray = [
-  [1, "up", 25, 100],
-  [2, "up", 50, 100],
-  [3, "up", 75, 100],
-  [4, "down", 0, 100],
-  [5, "down", 25, 100],
-  [6, "down", 50, 100],
-  [7, "down", 75, 100],
-  [8, "olymp", 0, 100],
-  [9, "olymp", 25, 100],
-  [10, "olymp", 50, 100],
-  [11, "olymp", 75, 100],
-  [12, "tartarus", 0, 100],
-  [13, "tartarus", 25, 100],
-  [14, "tartarus", 50, 100],
-  [15, "tartarus", 75, 100],
-];
 
 function setupDataArray(participantId) {
   shuffled = shuffleArray(dataArray, participantId);
@@ -235,6 +247,31 @@ let tableData = [
     max: "",
   },
 ];
+
+/* make DB data ready for tabulator */
+async function loadTrialsFromDB() {
+  if (!currentParticipant) {
+    alert("No participant selected");
+    return;
+  }
+
+  participantId = participationIdInput.value;
+  const rows = await res.json();
+
+  /* Convert DB rows to Tabulator format */
+  tableData = rows.map((r) => ({
+    id: r.trialIndex,
+    mode: r.mode,
+    min: r.min,
+    max: r.max,
+  }));
+
+  // Track max ID for "+"
+  startID = Math.max(...tableData.map((r) => r.id), 0);
+
+  // Load into table
+  table.setData(tableData);
+}
 
 // Create Tabulator
 const table = new Tabulator("#table", {
@@ -319,7 +356,7 @@ const table = new Tabulator("#table", {
 });
 
 //load Button
-document.getElementById("load-data").addEventListener("click", () => {
+/* document.getElementById("load-data").addEventListener("click", () => {
   const data = dataArray.map((row) => ({
     id: row[0],
     mode: row[1],
@@ -327,50 +364,116 @@ document.getElementById("load-data").addEventListener("click", () => {
     max: row[3],
   }));
   table.setData(data);
+}); */
+/* Load data received from server and DB */
+document.getElementById("load-data").addEventListener("click", async () => {
+  const res = await fetch("/db/start-trials");
+  const data = await res.json();
+  table.setData(data);
+  shuffled = data;
+  console.log("Loaded START_TRIALS:", data);
 });
 
-document.getElementById("shuffle-data").addEventListener("click", () => {
-  apply();
-  shuffled = setupDataArray(participantId);
+/* Load data already saved data from server and DB */
+document.getElementById("load-saved").addEventListener("click", async () => {
+  if (!window.currentParticipantDbId) {
+    alert("Apply participant first");
+    return;
+  }
+
+  const res = await fetch(`/db/trials/${window.currentParticipantDbId}`);
+  const data = await res.json();
+  table.setData(data);
+  shuffled = data;
+  console.log("Loaded saved trials:", data);
+});
+
+document.getElementById("shuffle-data").addEventListener("click", async () => {
+  /* Ensure participant is registered first */
+  if (!window.currentParticipantDbId) {
+    await apply("table");
+    if (!window.currentParticipantDbId) return; // apply failed
+  }
+
+  const seed = parseInt(participantId, 10) || Math.floor(Math.random() * 9999);
+
+  let currentData = table.getData();
+
+  if (!currentData.length) {
+    const res = await fetch("/db/start-trials");
+    currentData = await res.json();
+  }
+
+  const shuffledData = shuffleArray(currentData, seed);
+
+  /* Re-assign sequential IDs after shuffle */
+  shuffledData.forEach((row, i) => {
+    row.id = i + 1;
+  });
+
+  shuffled = shuffledData;
+  currentShuffledIndex = 0;
+
   table.setData(shuffled);
-  currentShuffledIndex = 0; // Reset index
-  console.log("Shuffled trials:", shuffled);
+  console.log("Shuffled trials (seed=" + seed + "):", shuffled);
 });
 
 /* Shuffle Matrix send */
 
 async function startTrial() {
-  if (!dataFormat) {
-    alert("Please apply either table data or drawn points first!");
+  if (!window.currentParticipantDbId) {
+    alert("Apply a participant first!");
     return;
   }
 
   if (dataFormat === "table") {
     const tableData = table.getData();
 
-    if (tableData.length === 0) {
-      alert("Please load or create trial data first!");
+    if (!tableData.length) {
+      alert("Table is empty – load or enter trial data first.");
+      return;
+    }
+    const saveRes = await fetch("/db/trials", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        participantId: window.currentParticipantDbId,
+        trials: tableData,
+      }),
+    });
+
+    if (!saveRes.ok) {
+      alert("Failed to save trials to DB");
       return;
     }
 
     shuffled = tableData;
     currentShuffledIndex = 0;
 
-    console.log("Starting trial with table data:", shuffled);
-    socket.emit("startTrial", shuffled);
+    socket.emit("startTrial", {
+      participantId: window.currentParticipantDbId,
+      trials: shuffled,
+    });
+
+    console.log(
+      "Trial started. Participant DB id:",
+      window.currentParticipantDbId,
+    );
   }
 
   if (dataFormat === "canvas") {
     const pointsArray = convertDrawnPointsToArray();
 
-    if (pointsArray.length === 0) {
+    if (!pointsArray.length) {
       alert("Please draw something first!");
       return;
     }
 
-    console.log("Sending drawn points:", pointsArray);
     socket.emit("drawnPoints", pointsArray);
-    socket.emit("startTrial");
+    socket.emit("startTrial", {
+      participantId: window.currentParticipantDbId,
+      trials: [],
+    });
   }
 
   document.getElementById("editing-section").style.display = "none";
