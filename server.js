@@ -31,8 +31,8 @@ function initDB() {
   db.serialize(() => {
     db.run(`
       CREATE TABLE IF NOT EXISTS participants (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        participantCode TEXT NOT NULL,
+        idId INTEGER PRIMARY KEY AUTOINCREMENT,
+        participantId TEXT NOT NULL,
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -99,15 +99,15 @@ app.get("/db/start-trials", (req, res) => {
 
 /* create new participant for DB */
 app.post("/db/participant", (req, res) => {
-  const { participantCode } = req.body;
+  const { participantId } = req.body;
 
   if (!participantCode) {
-    return res.status(400).json({ error: "participantCode required" });
+    return res.status(400).json({ error: "participantId required" });
   }
 
   db.run(
     "INSERT INTO participants (participantCode) VALUES (?)",
-    [participantCode],
+    [participantId],
     function (err) {
       if (err) return res.status(400).json({ error: err.message });
       res.json({ id: this.lastID });

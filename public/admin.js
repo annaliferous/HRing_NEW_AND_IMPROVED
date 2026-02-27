@@ -35,7 +35,7 @@ async function apply(format) {
   const res = await fetch("/db/participant", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ participantCode: participantId }),
+    body: JSON.stringify({ participantId }),
   });
 
   if (!res.ok) {
@@ -46,7 +46,7 @@ async function apply(format) {
   }
 
   const data = await res.json();
-  window.currentParticipantDbId = data.id;
+  window.currentParticipantDbId = data.dbId;
 
   dataFormat = format;
   console.log(`Participant "${participantId}" created with DB id ${data.id}`);
