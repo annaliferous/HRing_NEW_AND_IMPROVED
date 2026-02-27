@@ -64,6 +64,7 @@ const participantSessions = {};
 
 /* Starting data */
 const START_TRIALS = [
+  { mode: "up", min: 0, max: 100 },
   { mode: "up", min: 25, max: 100 },
   { mode: "up", min: 50, max: 100 },
   { mode: "up", min: 75, max: 100 },
@@ -454,3 +455,5 @@ server.listen(3000, () => {
   console.log("Server running at http://localhost:3000/");
   initializeSerial();
 });
+
+module.exports = { app, server, db };
