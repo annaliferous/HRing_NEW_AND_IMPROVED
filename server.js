@@ -438,11 +438,13 @@ process.on("SIGINT", () => {
     }
   });
 });
+
+/* redirects for deployment */
 app.get("/", (req, res) => {
   res.redirect("/participant");
 });
 app.get("/", (req, res) => {
-  res.redirect("/admin"); // or "/admin"
+  res.redirect("/admin");
 });
 app.get("/participant", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "participant.html"));
