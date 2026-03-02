@@ -24,14 +24,12 @@ let dataFormat = null; // "table" or "canvas"
 
 async function apply(format) {
   participantId = participationIdInput.value.trim();
-  console.log("participantId:", participantId);
 
   if (!participantId) {
     alert("Enter Participant ID");
     return;
   }
 
-  // Create participant row in DB, store the auto-increment id
   const res = await fetch("/db/participant", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -40,8 +38,7 @@ async function apply(format) {
 
   if (!res.ok) {
     const err = await res.json();
-    console.error("Server error:", err);
-    alert("Failed to create participant");
+    alert("Failed to create participant: " + err.error);
     return;
   }
 
@@ -49,9 +46,8 @@ async function apply(format) {
   window.currentParticipantDbId = data.dbId;
 
   dataFormat = format;
-  console.log(`Participant "${participantId}" created with DB id ${data.id}`);
+  console.log(`Participant "${participantId}" created with dbId ${data.dbId}`);
 }
-
 /* Drawing Table */
 const canvas = document.querySelector("canvas"),
   ctx = canvas.getContext("2d");
@@ -355,16 +351,6 @@ const table = new Tabulator("#table", {
   ],
 });
 
-//load Button
-/* document.getElementById("load-data").addEventListener("click", () => {
-  const data = dataArray.map((row) => ({
-    id: row[0],
-    mode: row[1],
-    min: row[2],
-    max: row[3],
-  }));
-  table.setData(data);
-}); */
 /* Load data received from server and DB */
 document.getElementById("load-data").addEventListener("click", async () => {
   const res = await fetch("/db/start-trials");
@@ -437,7 +423,8 @@ async function startTrial() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        participantId: window.currentParticipantDbId,
+        dbId: window.currentParticipantDbId,
+        participantId: participantId,
         trials: tableData,
       }),
     });
@@ -451,7 +438,8 @@ async function startTrial() {
     currentShuffledIndex = 0;
 
     socket.emit("startTrial", {
-      participantId: window.currentParticipantDbId,
+      dbId: window.currentParticipantDbId,
+      participantId: participantId,
       trials: shuffled,
     });
 

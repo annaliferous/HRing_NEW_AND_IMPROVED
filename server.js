@@ -31,15 +31,16 @@ function initDB() {
   db.serialize(() => {
     db.run(`
       CREATE TABLE IF NOT EXISTS participants (
-        idId INTEGER PRIMARY KEY AUTOINCREMENT,
-        participantId TEXT NOT NULL,
+        dbId INTEGER PRIMARY KEY AUTOINCREMENT,   
+        participantId TEXT NOT NULL,              
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+  )
+`);
 
     db.run(`
       CREATE TABLE IF NOT EXISTS trials (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        dbId INTEGER NOT NULL, 
         participantId INTEGER NOT NULL,
         trialIndex INTEGER NOT NULL,
         mode TEXT,
@@ -52,7 +53,7 @@ function initDB() {
         pleasant REAL,
         focus REAL,
         realism REAL,
-        FOREIGN KEY (participantId) REFERENCES participants(id)
+        FOREIGN KEY (dbId) REFERENCES participants(dbId)
       )
     `);
 
@@ -101,16 +102,16 @@ app.get("/db/start-trials", (req, res) => {
 app.post("/db/participant", (req, res) => {
   const { participantId } = req.body;
 
-  if (!participantCode) {
+  if (!participantId) {
     return res.status(400).json({ error: "participantId required" });
   }
 
   db.run(
-    "INSERT INTO participants (participantCode) VALUES (?)",
+    "INSERT INTO participants (participantId) VALUES (?)",
     [participantId],
     function (err) {
       if (err) return res.status(400).json({ error: err.message });
-      res.json({ id: this.lastID });
+      res.json({ dbId: this.lastID });
     },
   );
 });
@@ -140,13 +141,7 @@ app.get("/db/trials/:participantId", (req, res) => {
 
 /* save/replace trial data for the current trial and participant */
 app.post("/db/trials", (req, res) => {
-  const { participantId, trials } = req.body;
-
-  if (!participantId || !Array.isArray(trials)) {
-    return res
-      .status(400)
-      .json({ error: "participantId and trials[] required" });
-  }
+  const { dbId, participantId, trials } = req.body;
 
   // Replace existing trials for this participant
   db.serialize(() => {
@@ -158,7 +153,7 @@ app.post("/db/trials", (req, res) => {
     `);
 
     trials.forEach((t, i) => {
-      stmt.run(participantId, i + 1, t.mode, t.min, t.max);
+      stmt.run(dbId, participantId, i + 1, t.mode, t.min, t.max);
     });
 
     stmt.finalize((err) => {
@@ -171,7 +166,8 @@ app.post("/db/trials", (req, res) => {
 
 /* Study State */
 let currentStudy = {
-  participantDbId: null,
+  dbId: null,
+  participantId: null,
   trialIndex: 0,
 };
 
@@ -203,8 +199,9 @@ io.on("connection", (socket) => {
       return;
     }
 
-    const { participantId, trials } = data;
-    currentStudy.participantDbId = participantId;
+    const { dbId, participantId, trials } = data;
+    currentStudy.dbId = data.dbId;
+    currentStudy.participantId = participantId;
     currentStudy.trialIndex = 1;
     socket.broadcast.emit("trialStarted", { trials: trials ?? [] });
   });
@@ -306,7 +303,7 @@ io.on("connection", (socket) => {
         pleasant=?,
         focus=?,
         realism=?
-      WHERE participantId=? AND trialIndex=?
+      WHERE dbId=? AND trialIndex=?
       `,
       [
         session.calibrationValue,
@@ -318,7 +315,7 @@ io.on("connection", (socket) => {
         session.focus,
         session.realism,
 
-        currentStudy.participantDbId,
+        currentStudy.participantId,
         currentStudy.trialIndex,
       ],
       function (err) {
@@ -451,8 +448,8 @@ app.get("/admin", (req, res) => {
 });
 
 // Start Server on Port 3000
-server.listen(3000, () => {
-  console.log("Server running at http://localhost:3000/");
+server.listen(3000, "0.0.0.0", () => {
+  console.log("Server is running");
   initializeSerial();
 });
 
