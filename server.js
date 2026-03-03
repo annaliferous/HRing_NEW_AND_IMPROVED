@@ -13,6 +13,18 @@ const sqlite3 = require("sqlite3").verbose();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+/* redirects for deployment */
+app.get("/", (req, res) => {
+  res.redirect("/participant");
+});
+
+app.get("/participant", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "participant.html"));
+});
+
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
+});
 
 app.use(express.json());
 
@@ -437,19 +449,6 @@ process.on("SIGINT", () => {
       process.exit(0);
     }
   });
-});
-
-/* redirects for deployment */
-app.get("/", (req, res) => {
-  res.redirect("/participant");
-});
-
-app.get("/participant", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "participant.html"));
-});
-
-app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
 // Start Server on Port 3000
