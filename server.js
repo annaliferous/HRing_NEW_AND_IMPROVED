@@ -455,7 +455,7 @@ app.get("/admin", (req, res) => {
 });
 
 // Start Server on Port 3000
-server.listen(3000, "0.0.0.0", () => {
+server.listen(22022, "0.0.0.0", () => {
   console.log("Server is running");
   initializeSerial();
 });
