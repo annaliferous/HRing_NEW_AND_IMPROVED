@@ -13,6 +13,10 @@ const sqlite3 = require("sqlite3").verbose();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+app.use(express.json());
+app.use(cors());
+
 /* redirects for deployment */
 app.get("/", (req, res) => {
   res.redirect("/participant");
@@ -26,10 +30,7 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
-app.use(express.json());
-
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors());
 
 /* Data base creation */
 const db = new sqlite3.Database("./hRingDB.db", (err) => {
