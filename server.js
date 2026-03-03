@@ -443,9 +443,7 @@ process.on("SIGINT", () => {
 app.get("/", (req, res) => {
   res.redirect("/participant");
 });
-app.get("/", (req, res) => {
-  res.redirect("/admin");
-});
+
 app.get("/participant", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "participant.html"));
 });
