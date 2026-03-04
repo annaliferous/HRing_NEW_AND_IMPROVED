@@ -800,3 +800,12 @@ function endStudy() {
     alert("Study ended. You can start a new study from the editing section.");
   }
 }
+
+// for testing purposes
+if (typeof window !== "undefined") {
+  window.seededRandom = seededRandom;
+  window.shuffleArray = shuffleArray;
+  window.convertDrawnPointsToArray = convertDrawnPointsToArray;
+  window.apply = apply;
+  window.approveCurrentTrial = approveCurrentTrial;
+}

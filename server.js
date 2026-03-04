@@ -222,13 +222,13 @@ io.on("connection", (socket) => {
   });
 
   /* Drawn Points */
-  socket.on("drawnPoints", (points) => {
+  /*   socket.on("drawnPoints", (points) => {
     console.log("Received drawn points from admin:", points);
     console.log(`Total points: ${points.length}`);
 
     socket.broadcast.emit("points", points);
   });
-
+ */
   /* Participant */
   socket.on("finishedCalibration", (value) => {
     console.log("Calibration finished!");
@@ -326,13 +326,6 @@ io.on("connection", (socket) => {
         currentStudy.participantId,
         currentStudy.trialIndex,
       ],
-      function (err) {
-        if (err) {
-          console.error("DB Save Error:", err);
-        } else {
-          console.log("Trial saved:", this.changes);
-        }
-      },
     );
     currentStudy.trialIndex += 1;
     /* tell admin that the partcicipant is ready for the neyt run */

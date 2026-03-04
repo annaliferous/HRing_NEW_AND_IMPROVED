@@ -1,4 +1,4 @@
-/* test post and get rquests for db*/
+/* test post and get requests for db*/
 
 const request = require("supertest");
 /* make http requests without listening to a real port */
