@@ -473,3 +473,20 @@ document.addEventListener("DOMContentLoaded", () => {
     waitingHourglassEl.appendChild(waitingImg);
   }
 });
+
+/* for testing */
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    realTimeCalculation,
+    __setState: (state) => {
+      if (state.currentTrial !== undefined) currentTrial = state.currentTrial;
+      if (state.calibrationValue !== undefined)
+        calibrationValue = state.calibrationValue;
+      if (state.receivedDrawnPoints !== undefined)
+        receivedDrawnPoints = state.receivedDrawnPoints;
+      if (state.selectedCanvas !== undefined)
+        selectedCanvas = state.selectedCanvas;
+    },
+  };
+}
