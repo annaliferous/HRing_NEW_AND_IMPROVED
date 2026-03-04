@@ -17,11 +17,6 @@ const io = new Server(server);
 app.use(express.json());
 app.use(cors());
 
-/* redirects for deployment */
-app.get("/", (req, res) => {
-  res.redirect("/participant");
-});
-
 app.get("/participant", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "participant.html"));
 });
