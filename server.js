@@ -156,9 +156,9 @@ app.post("/db/trials", (req, res) => {
     db.run("DELETE FROM trials WHERE participantId=?", [participantId]);
 
     const stmt = db.prepare(`
-      INSERT INTO trials (participantId, trialIndex, mode, min, max)
-      VALUES (?, ?, ?, ?, ?)
-    `);
+    INSERT INTO trials (dbId, participantId, trialIndex, mode, min, max)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
 
     trials.forEach((t, i) => {
       stmt.run(dbId, participantId, i + 1, t.mode, t.min, t.max);
@@ -296,7 +296,7 @@ io.on("connection", (socket) => {
     session.realism = data.realism ?? session.realism;
     console.log(
       "Saving trial — participantDbId:",
-      currentStudy.participantDbId,
+      currentStudy.dbId,
       "trialIndex:",
       currentStudy.trialIndex,
     );
@@ -323,7 +323,7 @@ io.on("connection", (socket) => {
         session.focus,
         session.realism,
 
-        currentStudy.participantId,
+        currentStudy.dbId,
         currentStudy.trialIndex,
       ],
     );
