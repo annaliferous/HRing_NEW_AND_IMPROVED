@@ -20,10 +20,10 @@ The HRing is made up of following parts:
 ```
 npm start
 ```
-- To start Frontend (in Visual Studio Code):
-  - Install the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) Extension.
-  - Click the **Go Live** Button on the botton right.
-
+- To start Frontend:
+  - Participant Frontend: http://localhost:3000/participant
+  - Admin Frontend: http://localhost:3000/admin
+    
 ## Contributers
 
 ## Licenses
