@@ -2,7 +2,6 @@
 
 ## Description
 Even though haptics play an important role in our perception of the outside world, it is still not that prevelant in VR and AR outside of vibrotactile cues. <br>
-//Stuff still to add//
 The HRing offers an affordable and easy to assemble alternative.
 Through cutaneous stimuli by skin deformation the HRing gives the illusion of a bumpy surface.
 
@@ -28,10 +27,3 @@ npm start
 
 ## Licenses
 
-## Still to fix
-- save after every mode
-- cable-less connection (maybe Hotspot -> connection still good?)
-- different curves: slider for choosing (new branch)
-- value change BEFORE touching slider
-- a sliderless version (new branch)
-- connection to tablet????????
